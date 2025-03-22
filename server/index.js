@@ -31,6 +31,18 @@ app.post("/create", (req, res)=>{
     );
 });
 
+app.get("/proveedores", (req, res)=>{
+    db.query('SELECT  *  FROM proveedores',
+        (error,result)=>{
+            if(error){
+                console.log(err);
+            }else{
+                res.send(result);
+            }
+        }
+    );
+});
+
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001")
 })
