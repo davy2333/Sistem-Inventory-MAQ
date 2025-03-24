@@ -1,0 +1,285 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fuente más moderna y legible */
+    background:url(https://c1.wallpaperflare.com/preview/1008/960/1023/commercial-street-ppt-background-loom.jpg);
+    background-repeat: no-repeat;          
+    background-size: cover; /* Asegura que la imagen cubra todo el fondo */
+  
+    height: 100vh;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    color: white; /* Color de texto predeterminado para mejor contraste */
+}
+.scroll-container {
+  width: 100%; /* Ancho del contenedor */
+  height: 100%; /* Alto del contenedor */
+  overflow: auto; /* Habilita el desplazamiento si el contenido se desborda */
+  /* Opcional: agrega un borde para visualización */
+}
+
+.contenido-desbordante {
+  width: 600px; /* Ancho del contenido (mayor que el contenedor) */
+  height: 400px; /* Alto del contenido (mayor que el contenedor) */
+}
+.container {
+    display: grid;
+ }
+ h2 {
+  color: white;
+  font-size: 1.8rem; /* Usa rem para escalabilidad */
+  font-weight: 600; /* Agrega un peso de fuente semibold */
+  margin: 24px 0 32px; /* Ajusta los márgenes para mejor espaciado */
+  letter-spacing: 0.5px; /* Ligero espaciado entre letras */
+  text-transform: uppercase; /* Opcional: convierte el texto a mayúsculas */
+  text-align: center;
+}
+.input-box {
+  display: flex; /* Alinea los elementos horizontalmente */
+  align-items: center; /* Alinea verticalmente los elementos al centro */
+  margin-bottom: 20px;
+  justify-content: center; /* Centra los elementos horizontalmente */
+}
+
+.input-box input {
+  width: 40%;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 15px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.2);
+  color: rgb(255, 255, 255);
+  outline: 2px solid transparent;
+  box-shadow: inset 0 2px 5px rgba(231, 222, 222, 0.15);
+  transition: outline-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  margin-right: 10px; /* Espacio entre el input y el botón Buscar */
+}
+
+.Buscar-btn, .Eliminar-btn, .listbox-container {
+  margin-left: 10px; /* Espacio entre los botones y el listbox */
+}
+
+/* El resto de tu CSS permanece igual */
+
+.input-box input:focus {
+  outline-color: #66b3ff; /* Color de contorno al enfocar */
+  box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.3); /* Sombra más pronunciada al enfocar */
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.input-box input::placeholder { /* Estilo para el placeholder */
+  color: rgba(255, 255, 255, 0.907); /* Placeholder más sutil */
+}
+.Eliminar-btn {
+  background: rgb(249, 11, 74);
+  align-items: center;
+  color: #ffffff; /* Color de texto más definido */
+  padding: 12px 24px; /* Ligero ajuste del padding */
+  border-radius: 10px; /* Ajuste del radio del borde */
+  font-size: 1em; /* Usa rem para escalabilidad */
+  font-weight: 600; /* Agrega un peso de fuente semibold */
+  cursor: pointer;
+  width: 120px;
+  border: none; /* Elimina el borde predeterminado */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Agrega un sutil box-shadow */
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; /* Transiciones suaves */
+margin: 10px;
+}
+.Eliminar-btn:hover {
+  background-color: #9e1823; /* Color de fondo al pasar el ratón */
+  transform: translateY(-2px); /* Pequeño desplazamiento hacia arriba */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
+}
+
+.Eliminar-btn:active {
+  background-color: #800b17; /* Color de fondo al hacer clic */
+  transform: translateY(1px); /* Pequeño desplazamiento hacia abajo */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra más sutil */
+}
+.Buscar-btn {
+  background: rgb(161, 84, 206);
+  color: #ffffff; /* Color de texto más definido */
+  padding: 12px 24px; /* Ligero ajuste del padding */
+  border-radius: 10px; /* Ajuste del radio del borde */
+  font-size: 1rem; /* Usa rem para escalabilidad */
+  font-weight: 600; /* Agrega un peso de fuente semibold */
+  cursor: pointer;
+  width: 150px;
+  border: none; /* Elimina el borde predeterminado */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Agrega un sutil box-shadow */
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; /* Transiciones suaves */
+margin: 10px;
+}
+.Buscar-btn:hover {
+  background-color: #9939a1; /* Color de fondo al pasar el ratón */
+  transform: translateY(-2px); /* Pequeño desplazamiento hacia arriba */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
+}
+
+.Buscar-btn:active {
+  background-color: #843a93; /* Color de fondo al hacer clic */
+  transform: translateY(1px); /* Pequeño desplazamiento hacia abajo */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra más sutil */
+}
+.select-container {
+  position: relative;
+  display: inline-block; /* Para que no ocupe todo el ancho */
+}
+
+.mi-select {
+  width: 230px; /* Ajusta el ancho según tus necesidades */
+  padding: 12px 16px;
+  font-size: 1rem; /* Usa rem para escalabilidad */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #333;
+  appearance: none; /* Elimina el estilo predeterminado del navegador */
+  -webkit-appearance: none; /* Para navegadores basados en WebKit */
+  -moz-appearance: none; /* Para Firefox */
+  cursor: pointer;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px top 50%;
+  background-size: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transición para todos los cambios */
+}
+
+.mi-select:focus {
+  outline: none;
+  border-color: #66b3ff;
+  box-shadow: 0 0 5px rgba(102, 179, 255, 0.5);
+}
+
+.mi-select option {
+  padding: 10px;
+  font-size: 0.9rem; /* Usa rem para escalabilidad */
+  color: #333;
+  background-color: #fff;
+}
+
+.mi-select option:hover {
+  background-color: #f8f8f8;
+}
+.listbox-container {
+  width: 230px; /* Aumenta el ancho para mejor legibilidad */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fuente moderna */
+  position: relative;
+  border: 1px solid #ddd; /* Borde más sutil */
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+ 
+}
+.listbox-header {
+  background-color: #fff; /* Fondo blanco */
+  padding: 12px 16px; /* Aumenta el padding */
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee; /* Separador sutil */
+}
+
+.listbox-title {
+  font-size: 16px;
+  color: #333;
+}
+
+.listbox-icon {
+  transition: transform 0.3s ease;
+  font-size: 18px; /* Aumenta el tamaño del icono */
+  color: #555555;
+}
+
+.listbox-options {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  display: none; /* Oculto por defecto */
+  border-top: 1px solid #eee; /* Separador sutil */
+}
+
+.listbox-option {
+  padding: 12px 16px; /* Aumenta el padding */
+  cursor: pointer;
+  font-size: 15px;
+  color: #333333;
+  transition: background-color 0.2s ease; /* Transición suave al pasar el mouse */
+}
+
+.listbox-option:hover {
+  background-color: #f8f8f8; /* Gris claro al pasar el mouse */
+}
+
+.listbox-options.show {
+  display: block; /* Mostrar con la clase 'show' */
+}
+
+.listbox-icon.rotate {
+  transform: rotate(180deg);
+}
+table {
+  min-width: 800px;
+    width: 100%; /* Asegura que la tabla ocupe todo el ancho disponible */
+    background-color: rgba(255, 255, 255, 0.15); /* Aumenta un poco la opacidad */
+    backdrop-filter: blur(10px); /* Ligero ajuste del blur */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Ajuste del box-shadow */
+    font-size: 14px;
+    border-collapse: collapse; /* Elimina los bordes dobles entre celdas */
+    border-spacing: 0; /* Elimina el espacio entre celdas */
+    table-layout: fixed; /* Mantiene el ancho de las columnas fijo */
+    margin: 20px; /* Añade un margen superior e inferior para separación del contenido */
+    text-align: center;
+   }
+  
+  th,
+  td {
+    padding: 0.8rem 1rem; /* Añade relleno para mejorar la legibilidad del contenido */
+    text-align: center; /* Alinea el texto a la izquierda por defecto */
+    border: 1px solid #ddd; /* Añade un borde inferior sutil a las celdas */
+    font-size: 1em;
+    padding: 8px;
+  
+    font-size: 1vw; 
+    text-overflow: ellipsis;
+}
+td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
+}
+  th {
+    background-color: #f2f2f2; /* Un fondo gris claro para los encabezados */
+    font-weight: bold; /* Hace el texto de los encabezados en negrita */
+}
+  
+  /* Opcional: Estilo alternativo para filas para mejor legibilidad */
+
+  
+  /* Opcional: Estilo para el hover de las filas */
+  tr:hover {
+    backdrop-filter: blur(12px); /* Ligero cambio al hacer hover */
+    background-color: rgba(255, 255, 255, 0.2); /* Ligero cambio al hacer hover */
+  }
+  
+  /* Opcional: Estilo para la ultima fila */
+
+  thead {
+    background: rgba(243, 140, 210, 0.6); /* Aumenta la opacidad para mejor visibilidad */
+    color: #333; /* Cambia el color del texto a un gris oscuro para mejor legibilidad */
+    text-align: left; /* Alinea el texto a la izquierda por defecto */
+    border-bottom: 2px solid rgba(243, 140, 210, 0.8); /* Añade un borde inferior más destacado */
+  }
+  
+  thead th {
+    padding: 1rem 1.2rem; /* Añade relleno para mejorar la legibilidad del contenido */
+    font-weight: 600; /* Hace el texto de los encabezados un poco más fuerte */
+  }
