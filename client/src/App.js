@@ -6,8 +6,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
   const [nombre, setNombre] = useState("");
   const [direccion, setDireccion] = useState("");
-  const [numero_telefonico, setNumero_telefonico] = useState(0);
+  const [numero_telefonico, setNumero_telefonico] = useState();
   const [empresa, setEmpresa] = useState("");
+  const [id_proveedores, setId] = useState();
+
+  const [editar, setEditar] = useState(false);
+  
   const [proveedoresList, setProveedores] = useState([]);
 
   // Definir la función antes de usarla
@@ -35,12 +39,45 @@ function App() {
     })
       .then(() => {
         getProveedores();
-        alert("Proveedor registrado");
+        LimpiarCampos();
       })
       .catch((error) => {
         console.error("Error al registrar el proveedor:", error);
       });
-  };
+  }
+
+  const update = () => {
+    Axios.put("http://localhost:3001/update", {
+      id_proveedores:id_proveedores,
+      nombre: nombre,
+      direccion: direccion,
+      numero_telefonico: numero_telefonico,
+      empresa: empresa
+      
+    })
+      .then(() => {
+        getProveedores();
+        LimpiarCampos();
+      });
+  }
+
+  const LimpiarCampos = ()=>{
+    setNombre("");
+    setDireccion("");
+    setNumero_telefonico("");
+    setEmpresa("");
+  }
+
+      const editarProveedor = (val) =>{
+        setEditar(true);
+
+        setNombre(val.nombre);
+        setDireccion(val.direccion);
+        setNumero_telefonico(val.Numero_telefonico);
+        setEmpresa(val.empresa);
+        setId(val.id_proveedores);
+
+      }
 
   return (
     <div className="container">
@@ -56,7 +93,7 @@ function App() {
             onChange={(event) => {
               setNombre(event.target.value);
             }}
-            className="form-control" placeholder="Ingrese el nombre" aria-label="Username" aria-describedby="basic-addon1"/>
+            className="form-control" value={nombre} placeholder="Ingrese el nombre" aria-label="Username" aria-describedby="basic-addon1"/>
             
             </div>
 
@@ -66,17 +103,17 @@ function App() {
              onChange={(event) => {
               setDireccion(event.target.value);
             }}
-            className="form-control" placeholder="Ingrese la direccion" aria-label="Username" aria-describedby="basic-addon1"/>
+            className="form-control" value={direccion} placeholder="Ingrese la direccion" aria-label="Username" aria-describedby="basic-addon1"/>
             
             </div>
 
             <div className="input-group mb-3">
             <span className="input-group-text" id="basic-addon1">Numero de telefono:</span>
-            <input type="number" 
+            <input type="number" value={numero_telefonico}
             onChange={(event) =>{ 
-              setNumero_telefonico(Number(event.target.value));
+              setNumero_telefonico(event.target.value);
             }}
-            className="form-control" placeholder="Ingrese su telefono" aria-label="Username" aria-describedby="basic-addon1"/>
+            className="form-control"  placeholder="Ingrese su telefono" aria-label="Username" aria-describedby="basic-addon1"/>
             
             </div>
         
@@ -86,12 +123,21 @@ function App() {
               onChange={(event) =>{ 
                 setEmpresa(event.target.value);
               }}
-            className="form-control" placeholder="Ingrese el nombre de la empresa" aria-label="Username" aria-describedby="basic-addon1"/>
+            className="form-control" value={empresa} placeholder="Ingrese el nombre de la empresa" aria-label="Username" aria-describedby="basic-addon1"/>
             
             </div>
       </div>
-      <div className="card-footer text-body-secondary">
-      <button className='btn btn-success' onClick={add}>Registrar</button>
+      <div className="card-footer text-muted">
+        {
+          editar?
+          <div>
+          <button className='btn btn-warning m-2' onClick={update}>Actualizar</button> 
+          <button className='btn btn-info m-2' onClick={add}>Cancelar</button>
+          </div>
+          :<button className='btn btn-success' onClick={add}>Registrar</button>
+          
+
+        }
 
       </div>
       
@@ -105,6 +151,7 @@ function App() {
       <th scope="col">Direccion</th>
       <th scope="col">Telefono</th>
       <th scope="col">Empresa</th>
+      <th scope="col">Acciones</th>
     </tr>
   </thead>
   <tbody>
@@ -117,6 +164,18 @@ function App() {
                   <td>{val.direccion}</td>
                   <td>{val.Numero_telefonico}</td>
                   <td>{val.empresa}</td>
+                  <td>
+                  <div className="btn-group" role="group" aria-label="Basic example">
+                  <button type="button" 
+                  
+                  onClick={()=>{
+                    editarProveedor(val);
+                  }}
+
+                  className="btn btn-info">Editar</button>
+                  <button type="button" className="btn btn-danger">Eliminar</button>
+                  </div>
+                  </td>
                 </tr>
 
           })

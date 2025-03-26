@@ -43,6 +43,25 @@ app.get("/proveedores", (req, res)=>{
     );
 });
 
+app.put("/update", (req, res)=>{
+    const id_proveedores = req.body.id_proveedores;
+    const nombre = req.body.nombre;
+    const direccion = req.body.direccion;
+    const numero_telefonico= req.body.numero_telefonico;
+    const empresa = req.body.empresa;
+   
+
+    db.query('UPDATE proveedores SET nombre=?,direccion=?,numero_telefonico=?,empresa=? WHERE id_proveedores=?' ,[nombre,direccion,numero_telefonico,empresa,id_proveedores],
+        (error,result)=>{
+            if(error){
+                console.log(err);
+            }else{
+                res.send("proveedor actualizado con exito!!");
+            }
+        }
+    );
+});
+
 app.listen(3001,()=>{
     console.log("Corriendo en el puerto 3001")
 })
