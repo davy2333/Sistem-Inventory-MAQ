@@ -25,7 +25,7 @@ app.post("/create", (req, res)=>{
             if(error){
                 console.log(err);
             }else{
-                res.send("proveedor registrado con exito!!");
+                res.send(result);
             }
         }
     );
@@ -56,7 +56,21 @@ app.put("/update", (req, res)=>{
             if(error){
                 console.log(err);
             }else{
-                res.send("proveedor actualizado con exito!!");
+                res.send(result);
+            }
+        }
+    );
+});
+
+app.delete("/delete/:id_proveedores", (req, res)=>{
+    const id_proveedores = req.params.id_proveedores;
+   
+    db.query('DELETE FROM proveedores WHERE id_proveedores=?',id_proveedores,
+        (error,result)=>{
+            if(error){
+                console.log(err);
+            }else{
+                res.send(result);
             }
         }
     );

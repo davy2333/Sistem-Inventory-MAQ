@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 import Axios from "axios"; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import Swal from 'sweetalert2'
+
+
 function App() {
   const [nombre, setNombre] = useState("");
   const [direccion, setDireccion] = useState("");
@@ -40,11 +43,18 @@ function App() {
       .then(() => {
         getProveedores();
         LimpiarCampos();
+        Swal.fire({
+          title: "<strong>Registro exitoso!!</strong>",
+          html: "<i>El proveedor <strong>"+nombre+"</strong> fue registrado con exito!!</i>",
+          icon: 'success',
+          timer:3000
+        })
       })
       .catch((error) => {
         console.error("Error al registrar el proveedor:", error);
       });
   }
+
 
   const update = () => {
     Axios.put("http://localhost:3001/update", {
@@ -53,20 +63,41 @@ function App() {
       direccion: direccion,
       numero_telefonico: numero_telefonico,
       empresa: empresa
-      
+
     })
       .then(() => {
         getProveedores();
         LimpiarCampos();
+        Swal.fire({
+          title: "<strong>Actualizacion exitosa!!</strong>",
+          html: "<i>El proveedor <strong>"+nombre+"</strong> fue actualizado con exito!!</i>",
+          icon: 'success',
+          timer:3000
+        })
       });
   }
+
+  const deleteProv = (id_proveedores) => {
+    Axios.delete(`http://localhost:3001/delete/${id_proveedores}`).then(() => {
+        getProveedores();
+        LimpiarCampos();
+        Swal.fire({
+          title: "<strong>Eliminacion exitosa!!</strong>",
+          html: "<i>El proveedor <strong>"+nombre+"</strong> fue actualizado con exito!!</i>",
+          icon: 'success',
+          timer:3000
+        })
+      });
+  }
+
 
   const LimpiarCampos = ()=>{
     setNombre("");
     setDireccion("");
     setNumero_telefonico("");
     setEmpresa("");
-  }
+    setEditar(false);
+  }     
 
       const editarProveedor = (val) =>{
         setEditar(true);
@@ -84,7 +115,7 @@ function App() {
     
     <div className="card text-center">
       <div className="card-header">
-        Inventariado
+        PROVEEDORES
       </div>
       <div className="card-body">
           <div className="input-group mb-3">
@@ -132,7 +163,7 @@ function App() {
           editar?
           <div>
           <button className='btn btn-warning m-2' onClick={update}>Actualizar</button> 
-          <button className='btn btn-info m-2' onClick={add}>Cancelar</button>
+          <button className='btn btn-info m-2' onClick={LimpiarCampos}>Cancelar</button>
           </div>
           :<button className='btn btn-success' onClick={add}>Registrar</button>
           
@@ -173,7 +204,9 @@ function App() {
                   }}
 
                   className="btn btn-info">Editar</button>
-                  <button type="button" className="btn btn-danger">Eliminar</button>
+                  <button type="button" onClick={()=>{
+                    deleteProv(val.id_proveedores);
+                  }}  className="btn btn-danger">Eliminar</button>
                   </div>
                   </td>
                 </tr>
