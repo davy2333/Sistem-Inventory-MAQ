@@ -26,3 +26,37 @@
   height: 50px;
   margin-top: 5px;
 }
+
+/* Estilos adicionales para mejorar la responsividad */
+@media (max-width: 768px) {
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .btn-group .btn {
+    margin: 2px 0;
+  }
+}
+
+/* Mejorar la legibilidad en móviles */
+body {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  body {
+    font-size: 16px;
+  }
+}
+
+/* Ajustar el padding en móviles */
+.container-fluid {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+/* Mejorar el aspecto de los inputs en móviles */
+.form-control {
+  min-height: 38px;
+}

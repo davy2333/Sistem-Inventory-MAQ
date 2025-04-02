@@ -2,9 +2,7 @@ import './App.css';
 import { useState, useEffect } from "react";
 import Axios from "axios"; 
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-import Swal from 'sweetalert2'
-
+import Swal from 'sweetalert2';
 
 function App() {
   const [nombre, setNombre] = useState("");
@@ -12,12 +10,9 @@ function App() {
   const [numero_telefonico, setNumero_telefonico] = useState();
   const [empresa, setEmpresa] = useState("");
   const [id_proveedores, setId] = useState();
-
   const [editar, setEditar] = useState(false);
-  
   const [proveedoresList, setProveedores] = useState([]);
 
-  // Definir la función antes de usarla
   const getProveedores = () => {
     Axios.get("http://localhost:3001/proveedores")
       .then((response) => {
@@ -28,10 +23,9 @@ function App() {
       });
   };
 
-    // Llamar a getProveedores() cuando el componente se monta
-    useEffect(() => {
-      getProveedores();
-    }, []);
+  useEffect(() => {
+    getProveedores();
+  }, []);
 
   const add = () => {
     Axios.post("http://localhost:3001/create", {
@@ -49,12 +43,14 @@ function App() {
           icon: 'success',
           timer:3000
         })
-      })
-      .catch((error) => {
-        console.error("Error al registrar el proveedor:", error);
+      }).catch(function(error){
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente mas tarde":JSON.parse(JSON.stringify(error)).message
+        })
       });
   }
-
 
   const update = () => {
     Axios.put("http://localhost:3001/update", {
@@ -63,7 +59,6 @@ function App() {
       direccion: direccion,
       numero_telefonico: numero_telefonico,
       empresa: empresa
-
     })
       .then(() => {
         getProveedores();
@@ -74,24 +69,48 @@ function App() {
           icon: 'success',
           timer:3000
         })
-      });
-  }
-
-  const deleteProv = (id_proveedores) => {
-    Axios.delete(`http://localhost:3001/delete/${id_proveedores}`).then(() => {
-        getProveedores();
-        LimpiarCampos();
+      }).catch(function(error){
         Swal.fire({
-          title: "<strong>Eliminacion exitosa!!</strong>",
-          html: "<i>El proveedor <strong>"+nombre+"</strong> fue actualizado con exito!!</i>",
-          icon: 'success',
-          timer:3000
+          icon: "error",
+          title: "Oops...",
+          text: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente mas tarde":JSON.parse(JSON.stringify(error)).message
         })
       });
   }
 
+  const deleteProv = (val) => {
+    Swal.fire({
+      title: "Confirmar?",
+      html: "<i>Realmente desea eliminar a <strong>"+val.nombre+"</strong>?</i>",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, eliminarlo!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Axios.delete(`http://localhost:3001/delete/${val.id_proveedores}`).then(() => {
+          getProveedores();
+          LimpiarCampos();
+          Swal.fire({
+            title: "Eliminado!",
+            text: val.nombre + " fue eliminado",
+            icon: "success",
+            timer: 850
+          });
+        }).catch(function(error){
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "No se logro eliminar el emlpeado",
+            footer: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente mas tarde":JSON.parse(JSON.stringify(error)).message
+          })
+        });
+      }
+    });
+  }
 
-  const LimpiarCampos = ()=>{
+  const LimpiarCampos = () => {
     setNombre("");
     setDireccion("");
     setNumero_telefonico("");
@@ -99,127 +118,139 @@ function App() {
     setEditar(false);
   }     
 
-      const editarProveedor = (val) =>{
-        setEditar(true);
-
-        setNombre(val.nombre);
-        setDireccion(val.direccion);
-        setNumero_telefonico(val.Numero_telefonico);
-        setEmpresa(val.empresa);
-        setId(val.id_proveedores);
-
-      }
+  const editarProveedor = (val) => {
+    setEditar(true);
+    setNombre(val.nombre);
+    setDireccion(val.direccion);
+    setNumero_telefonico(val.Numero_telefonico);
+    setEmpresa(val.empresa);
+    setId(val.id_proveedores);
+  }
 
   return (
-    <div className="container">
-    
-    <div className="card text-center">
-      <div className="card-header">
-        PROVEEDORES
-      </div>
-      <div className="card-body">
-          <div className="input-group mb-3">
-            <span className="input-group-text" id="basic-addon1">Nombre:</span>
-            <input type="text" 
-            onChange={(event) => {
-              setNombre(event.target.value);
-            }}
-            className="form-control" value={nombre} placeholder="Ingrese el nombre" aria-label="Username" aria-describedby="basic-addon1"/>
-            
+    <div className="container-fluid px-md-5">
+      <div className="row justify-content-center">
+        <div className="col-12 col-md-10 col-lg-8">
+          <div className="card text-center my-4">
+            <div className="card-header bg-primary text-white">
+              <h1 className="h5 mb-0">PROVEEDORES</h1>
             </div>
-
-            <div className="input-group mb-3">
-            <span className="input-group-text" id="basic-addon1">Direccion:</span>
-            <input type="text" 
-             onChange={(event) => {
-              setDireccion(event.target.value);
-            }}
-            className="form-control" value={direccion} placeholder="Ingrese la direccion" aria-label="Username" aria-describedby="basic-addon1"/>
-            
-            </div>
-
-            <div className="input-group mb-3">
-            <span className="input-group-text" id="basic-addon1">Numero de telefono:</span>
-            <input type="number" value={numero_telefonico}
-            onChange={(event) =>{ 
-              setNumero_telefonico(event.target.value);
-            }}
-            className="form-control"  placeholder="Ingrese su telefono" aria-label="Username" aria-describedby="basic-addon1"/>
-            
-            </div>
-        
-            <div className="input-group mb-3">
-            <span className="input-group-text" id="basic-addon1">Empresa:</span>
-            <input type="text" 
-              onChange={(event) =>{ 
-                setEmpresa(event.target.value);
-              }}
-            className="form-control" value={empresa} placeholder="Ingrese el nombre de la empresa" aria-label="Username" aria-describedby="basic-addon1"/>
-            
-            </div>
-      </div>
-      <div className="card-footer text-muted">
-        {
-          editar?
-          <div>
-          <button className='btn btn-warning m-2' onClick={update}>Actualizar</button> 
-          <button className='btn btn-info m-2' onClick={LimpiarCampos}>Cancelar</button>
-          </div>
-          :<button className='btn btn-success' onClick={add}>Registrar</button>
-          
-
-        }
-
-      </div>
-      
-    </div>
-    
-    <table className="table table-striped">
-    <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Nombre</th>
-      <th scope="col">Direccion</th>
-      <th scope="col">Telefono</th>
-      <th scope="col">Empresa</th>
-      <th scope="col">Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-
-  {
-        proveedoresList.map((val, key) => {
-          return <tr key={val.id_proveedores}>
-                  <th>{val.id_proveedores}</th>
-                  <td>{val.nombre}</td>
-                  <td>{val.direccion}</td>
-                  <td>{val.Numero_telefonico}</td>
-                  <td>{val.empresa}</td>
-                  <td>
-                  <div className="btn-group" role="group" aria-label="Basic example">
-                  <button type="button" 
-                  
-                  onClick={()=>{
-                    editarProveedor(val);
-                  }}
-
-                  className="btn btn-info">Editar</button>
-                  <button type="button" onClick={()=>{
-                    deleteProv(val.id_proveedores);
-                  }}  className="btn btn-danger">Eliminar</button>
+            <div className="card-body">
+              <div className="row">
+                <div className="col-12 col-md-6 mb-3">
+                  <div className="input-group">
+                    <span className="input-group-text">Nombre:</span>
+                    <input 
+                      type="text" 
+                      onChange={(event) => setNombre(event.target.value)}
+                      className="form-control" 
+                      value={nombre} 
+                      placeholder="Ingrese el nombre" 
+                    />
                   </div>
-                  </td>
+                </div>
+
+                <div className="col-12 col-md-6 mb-3">
+                  <div className="input-group">
+                    <span className="input-group-text">Dirección:</span>
+                    <input 
+                      type="text" 
+                      onChange={(event) => setDireccion(event.target.value)}
+                      className="form-control" 
+                      value={direccion} 
+                      placeholder="Ingrese la dirección" 
+                    />
+                  </div>
+                </div>
+
+                <div className="col-12 col-md-6 mb-3">
+                  <div className="input-group">
+                    <span className="input-group-text">Teléfono:</span>
+                    <input 
+                      type="number" 
+                      value={numero_telefonico}
+                      onChange={(event) => setNumero_telefonico(event.target.value)}
+                      className="form-control"  
+                      placeholder="Ingrese su teléfono" 
+                    />
+                  </div>
+                </div>
+            
+                <div className="col-12 col-md-6 mb-3">
+                  <div className="input-group">
+                    <span className="input-group-text">Empresa:</span>
+                    <input 
+                      type="text" 
+                      onChange={(event) => setEmpresa(event.target.value)}
+                      className="form-control" 
+                      value={empresa} 
+                      placeholder="Ingrese el nombre de la empresa" 
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="card-footer text-muted">
+              {editar ? (
+                <div>
+                  <button className='btn btn-warning m-2' onClick={update}>Actualizar</button> 
+                  <button className='btn btn-info m-2' onClick={LimpiarCampos}>Cancelar</button>
+                </div>
+              ) : (
+                <button className='btn btn-success' onClick={add}>Registrar</button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="row justify-content-center">
+        <div className="col-12">
+          <div className="table-responsive">
+            <table className="table table-striped table-hover">
+              <thead className="table-dark">
+                <tr>
+                  <th scope="col">Nombre</th>
+                  <th scope="col">Dirección</th>
+                  <th scope="col">Teléfono</th>
+                  <th scope="col">Empresa</th>
+                  <th scope="col">Acciones</th>
                 </tr>
-
-          })
-        }
-  </tbody>
-    </table>
-
-  </div>
-  
+              </thead>
+              <tbody>
+                {proveedoresList.map((val) => (
+                  <tr key={val.id_proveedores}>
+                    <td>{val.nombre}</td>
+                    <td >{val.direccion}</td>
+                    <td>{val.Numero_telefonico}</td>
+                    <td >{val.empresa}</td>
+                    <td>
+                      <div className="btn-group" role="group">
+                        <button 
+                          type="button" 
+                          onClick={() => editarProveedor(val)}
+                          className="btn btn-info btn-sm"
+                        >
+                          Editar
+                        </button>
+                        <button 
+                          type="button" 
+                          onClick={() => deleteProv(val)}  
+                          className="btn btn-danger btn-sm"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   );
-  
 }
 
 export default App;
