@@ -39,7 +39,6 @@
   }
 }
 
-/* Mejorar la legibilidad en móviles */
 body {
   font-size: 14px;
 }
@@ -50,13 +49,11 @@ body {
   }
 }
 
-/* Ajustar el padding en móviles */
 .container-fluid {
   padding-left: 15px;
   padding-right: 15px;
 }
 
-/* Mejorar el aspecto de los inputs en móviles */
 .form-control {
   min-height: 38px;
 }
