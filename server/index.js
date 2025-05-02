@@ -4,7 +4,6 @@ const mysql = require("mysql");
 const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
-
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -15,7 +14,6 @@ const db = mysql.createConnection({
     user: "root",
     password: "",
     database: "systeminventorymaq",
-    port: "3307"
 });
 
 // Conexión
@@ -151,7 +149,39 @@ app.post("/upload", upload.single('file'), (req, res) => {
 });
 
 
+// ------------------------- CRUD CLIENTES -------------------------
+app.post("/clientes/create", (req, res) => {
+    const { Cliente, numero_telefonico, Email } = req.body;
+    db.query('INSERT INTO cliente(Cliente, numero_telefonico, Email) VALUES(?, ?, ?)',
+        [Cliente, numero_telefonico, Email],
+        (error, result) => error ? res.status(500).send(error) : res.send(result));
+});
+
+app.get("/clientes", (req, res) => {
+    db.query('SELECT * FROM cliente', (error, result) =>
+        error ? res.status(500).send(error) : res.send(result));
+});
+
+app.put("/clientes/update", (req, res) => {
+    const { id_cliente, Cliente, numero_telefonico, Email } = req.body;
+    db.query('UPDATE cliente SET Cliente=?, numero_telefonico=?, Email=? WHERE id_cliente=?',
+        [Cliente, numero_telefonico, Email, id_cliente],
+        (error, result) => error ? res.status(500).send(error) : res.send(result));
+});
+
+app.delete("/clientes/delete/:id", (req, res) => {
+    const id = req.params.id;
+    db.query('DELETE FROM cliente WHERE id_cliente=?', id,
+        (error, result) => error ? res.status(500).send(error) : res.send(result));
+});
+
+
+
+
+
+
 // ------------------------- INICIAR SERVIDOR -------------------------
 app.listen(3001, () => {
     console.log("Servidor corriendo en el puerto 3001");
 });
+
