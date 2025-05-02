@@ -79,144 +79,73 @@ app.delete("/tipoprenda/delete/:id", (req, res) => {
 });
 
 
-// ------------------------- CRUD PEDIDOS CON IMAGENES -------------------------
-app.post("/pedidos/create", upload.single('foto'), (req, res) => {
-    const {
-        Talla,
-        cantidad_confeccionada,
-        fecha_de_confeccion,
-        Fecha_estimada_de_entrega,
-        costo_por_unidad,
-        Estado,
-        id_tipo_prenda,
-        id_cliente
-    } = req.body;
-
-    const foto = req.file ? req.file.filename : null;
-
-    db.query(
-        `INSERT INTO pedidos 
-         (Talla, cantidad_confeccionada, fecha_de_confeccion, Fecha_estimada_de_entrega, 
-          costo_por_unidad, Estado, id_tipo_prenda, id_cliente, Foto)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [Talla, cantidad_confeccionada, fecha_de_confeccion, Fecha_estimada_de_entrega, 
-         costo_por_unidad, Estado, id_tipo_prenda, id_cliente, foto],
-        (error, result) => {
-            if (error) {
-                console.log(error);
-                // Si hay error, elimina la imagen subida
-                if (req.file) {
-                    fs.unlinkSync(req.file.path);
-                }
-                res.status(500).send(error);
-            } else {
-                res.send(result);
-            }
-        }
-    );
-});
-
+// ------------------------- CRUD PEDIDOS -------------------------
 app.get("/pedidos", (req, res) => {
-    db.query(
-        `SELECT p.*, tp.tipo_prenda, c.Cliente 
-         FROM pedidos p
-         LEFT JOIN tipo_prenda tp ON p.id_tipo_prenda = tp.id_tipo_prenda
-         LEFT JOIN cliente c ON p.id_cliente = c.id_cliente`,
-        (error, result) => {
-            if (error) {
-                console.log(error);
-                res.status(500).send(error);
-            } else {
-                res.send(result);
-            }
-        }
-    );
+    const query = `
+      SELECT 
+        p.*, 
+        c.Cliente AS nombre_cliente,
+        t.tipo_prenda AS nombre_prenda
+      FROM pedidos p
+      LEFT JOIN cliente c ON p.id_cliente = c.id_cliente
+      LEFT JOIN tipo_prenda t ON p.id_tipo_prenda = t.id_tipo_prenda
+    `;
+  
+    db.query(query, (err, result) => {
+      if (err) res.status(500).send(err);
+      else res.send(result);
+    });
+  });
+  
+
+app.post("/pedidos/create", (req, res) => {
+    const { Talla, cantidad_confeccionada, fecha_de_confeccion, Fecha_estimada_de_entrega, costo_por_unidad, Foto, Estado, id_tipo_prenda, id_cliente } = req.body;
+    db.query(`INSERT INTO pedidos 
+        (Talla, cantidad_confeccionada, fecha_de_confeccion, Fecha_estimada_de_entrega, costo_por_unidad, Foto, Estado, id_tipo_prenda, id_cliente)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [Talla, cantidad_confeccionada, fecha_de_confeccion, Fecha_estimada_de_entrega, costo_por_unidad, Foto, Estado, id_tipo_prenda, id_cliente],
+        (err, result) => err ? res.status(500).send(err) : res.send(result));
 });
 
-app.put("/pedidos/update", upload.single('foto'), (req, res) => {
-    const {
-        id_pedidos,
-        Talla,
-        cantidad_confeccionada,
-        fecha_de_confeccion,
-        Fecha_estimada_de_entrega,
-        costo_por_unidad,
-        Estado,
-        id_tipo_prenda,
-        id_cliente,
-        foto_existente
-    } = req.body;
-
-    const foto = req.file ? req.file.filename : foto_existente;
-
-    // Primero obtenemos la foto anterior para eliminarla si se sube una nueva
-    db.query("SELECT Foto FROM pedidos WHERE id_pedidos = ?", [id_pedidos], (err, result) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send(err);
-        }
-
-        const oldFoto = result[0]?.Foto;
-        
-        db.query(
-            `UPDATE pedidos 
-             SET Talla=?, cantidad_confeccionada=?, fecha_de_confeccion=?, Fecha_estimada_de_entrega=?, 
-                 costo_por_unidad=?, Estado=?, id_tipo_prenda=?, id_cliente=?, Foto=?
-             WHERE id_pedidos=?`,
-            [Talla, cantidad_confeccionada, fecha_de_confeccion, Fecha_estimada_de_entrega, 
-             costo_por_unidad, Estado, id_tipo_prenda, id_cliente, foto, id_pedidos],
-            (error, result) => {
-                if (error) {
-                    console.log(error);
-                    if (req.file) {
-                        fs.unlinkSync(req.file.path);
-                    }
-                    res.status(500).send(error);
-                } else {
-                    // Eliminar la imagen anterior si se subió una nueva
-                    if (req.file && oldFoto) {
-                        try {
-                            fs.unlinkSync(path.join(__dirname, 'uploads', oldFoto));
-                        } catch (err) {
-                            console.error("Error al eliminar la imagen anterior:", err);
-                        }
-                    }
-                    res.send(result);
-                }
-            }
-        );
-    });
+app.put("/pedidos/update", (req, res) => {
+    const { id_pedidos, Talla, cantidad_confeccionada, fecha_de_confeccion, Fecha_estimada_de_entrega, costo_por_unidad, Foto, Estado, id_tipo_prenda, id_cliente } = req.body;
+    db.query(`UPDATE pedidos SET 
+        Talla=?, cantidad_confeccionada=?, fecha_de_confeccion=?, Fecha_estimada_de_entrega=?, 
+        costo_por_unidad=?, Foto=?, Estado=?, id_tipo_prenda=?, id_cliente=?
+        WHERE id_pedidos=?`,
+        [Talla, cantidad_confeccionada, fecha_de_confeccion, Fecha_estimada_de_entrega, costo_por_unidad, Foto, Estado, id_tipo_prenda, id_cliente, id_pedidos],
+        (err, result) => err ? res.status(500).send(err) : res.send(result));
 });
 
-app.delete("/pedidos/delete/:id", (req, res) => {
-    const id = req.params.id;
-    
-    // Primero obtenemos la foto para eliminarla del sistema de archivos
-    db.query("SELECT Foto FROM pedidos WHERE id_pedidos = ?", [id], (err, result) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send(err);
-        }
+app.delete("/pedidos/delete/:id_pedidos", (req, res) => {
+    const id = req.params.id_pedidos;
+    db.query('DELETE FROM pedidos WHERE id_pedidos=?', [id],
+        (err, result) => err ? res.status(500).send(err) : res.send(result));
+});
 
-        const foto = result[0]?.Foto;
-        
-        db.query("DELETE FROM pedidos WHERE id_pedidos = ?", [id], (error, result) => {
-            if (error) {
-                console.log(error);
-                res.status(500).send(error);
-            } else {
-                // Eliminar la imagen asociada si existe
-                if (foto) {
-                    try {
-                        fs.unlinkSync(path.join(__dirname, 'uploads', foto));
-                    } catch (err) {
-                        console.error("Error al eliminar la imagen:", err);
-                    }
-                }
-                res.send(result);
-            }
-        });
-    });
+
+// ------------------------- CLIENTES (solo GET) -------------------------
+app.get("/clientes", (req, res) => {
+    db.query('SELECT * FROM cliente', (err, result) =>
+        err ? res.status(500).send(err) : res.send(result));
+});
+
+
+// ------------------------- SUBIR IMÁGENES -------------------------
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+    }
+});
+const upload = multer({ storage: storage });
+
+app.post("/upload", upload.single('file'), (req, res) => {
+    res.json({ filename: req.file.filename });
 });
 
 
