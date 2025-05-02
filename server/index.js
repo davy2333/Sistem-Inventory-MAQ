@@ -14,7 +14,6 @@ const db = mysql.createConnection({
     user: "root",
     password: "",
     database: "systeminventorymaq",
-    port: 3307
 });
 
 // Conexión
@@ -231,6 +230,49 @@ app.get('/inventario', (req, res) => {
       }
     });
   });
+
+
+// ------------------------- CRUD MANTENIMIENTO -------------------------
+app.post("/mantenimiento/create", (req, res) => {
+    const { id_inventario, detalle_problema, tecnico_encargado, estado_de_reparacion, Fecha, Costo } = req.body;
+    
+    db.query(`INSERT INTO mantenimiento 
+        (id_inventario, detalle_problema, tecnico_encargado, estado_de_reparacion, Fecha, Costo)
+        VALUES (?, ?, ?, ?, ?, ?)`,
+        [id_inventario, detalle_problema, tecnico_encargado, estado_de_reparacion, Fecha, Costo],
+        (err, result) => err ? res.status(500).send(err) : res.send(result));
+});
+
+app.get("/mantenimiento", (req, res) => {
+    const query = `
+      SELECT m.*, i.tipo_De_Equipo, i.Marca, i.Modelo 
+      FROM mantenimiento m
+      LEFT JOIN inventario i ON m.id_inventario = i.id_inventario
+    `;
+    
+    db.query(query, (err, result) => {
+      if (err) res.status(500).send(err);
+      else res.send(result);
+    });
+});
+
+app.put("/mantenimiento/update", (req, res) => {
+    const { id_mantenimiento, id_inventario, detalle_problema, tecnico_encargado, estado_de_reparacion, Fecha, Costo } = req.body;
+    
+    db.query(`UPDATE mantenimiento SET 
+        id_inventario=?, detalle_problema=?, tecnico_encargado=?, estado_de_reparacion=?, Fecha=?, Costo=?
+        WHERE id_mantenimiento=?`,
+        [id_inventario, detalle_problema, tecnico_encargado, estado_de_reparacion, Fecha, Costo, id_mantenimiento],
+        (err, result) => err ? res.status(500).send(err) : res.send(result));
+});
+
+app.delete("/mantenimiento/delete/:id", (req, res) => {
+    const id = req.params.id;
+    db.query('DELETE FROM mantenimiento WHERE id_mantenimiento=?', id,
+        (err, result) => err ? res.status(500).send(err) : res.send(result));
+});
+
+
 
 
 // ------------------------- INICIAR SERVIDOR -------------------------
