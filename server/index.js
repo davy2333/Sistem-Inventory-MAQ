@@ -14,6 +14,7 @@ const db = mysql.createConnection({
     user: "root",
     password: "",
     database: "systeminventorymaq",
+    port: 3307
 });
 
 // Conexión
@@ -175,9 +176,61 @@ app.delete("/clientes/delete/:id", (req, res) => {
         (error, result) => error ? res.status(500).send(error) : res.send(result));
 });
 
-
-
-
+// ----------------- Rutas para Inventario ------------------
+app.get('/inventario', (req, res) => {
+    db.query('SELECT * FROM inventario', (err, result) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send(err);
+      } else {
+        res.send(result);
+      }
+    });
+  });
+  
+  app.post('/create-inventario', (req, res) => {
+    const { tipoDeEquipo, marca, modelo, precio, fechaDeAdquisicion, condicion, codigo, idProveedor } = req.body;
+    db.query(
+      'INSERT INTO inventario (tipo_De_Equipo, Marca, Modelo, Precio, Fecha_De_Adquisicion, Condicion, Codigo, id_proveedores) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [tipoDeEquipo, marca, modelo, precio, fechaDeAdquisicion, condicion, codigo, idProveedor],
+      (err, result) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send(err);
+        } else {
+          res.send(result);
+        }
+      }
+    );
+  });
+  
+  app.put('/update-inventario', (req, res) => {
+    const { idInventario, tipoDeEquipo, marca, modelo, precio, fechaDeAdquisicion, condicion, codigo, idProveedor } = req.body;
+    db.query(
+      'UPDATE inventario SET tipo_De_Equipo = ?, Marca = ?, Modelo = ?, Precio = ?, Fecha_De_Adquisicion = ?, Condicion = ?, Codigo = ?, id_proveedores = ? WHERE id_inventario = ?',
+      [tipoDeEquipo, marca, modelo, precio, fechaDeAdquisicion, condicion, codigo, idProveedor, idInventario],
+      (err, result) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send(err);
+        } else {
+          res.send(result);
+        }
+      }
+    );
+  });
+  
+  app.delete('/delete-inventario/:id', (req, res) => {
+    const id = req.params.id;
+    db.query('DELETE FROM inventario WHERE id_inventario = ?', id, (err, result) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send(err);
+      } else {
+        res.send(result);
+      }
+    });
+  });
 
 
 // ------------------------- INICIAR SERVIDOR -------------------------
