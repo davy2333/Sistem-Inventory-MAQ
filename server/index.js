@@ -273,6 +273,47 @@ app.delete("/mantenimiento/delete/:id", (req, res) => {
 });
 
 
+// ------------------------- CRUD BAJAS -------------------------
+app.post("/bajas/create", (req, res) => {
+    const { id_inventario, motivo, fecha, persona_encargada } = req.body;
+    
+    db.query(`INSERT INTO bajas 
+        (id_inventario, motivo, fecha, persona_encargada)
+        VALUES (?, ?, ?, ?)`,
+        [id_inventario, motivo, fecha, persona_encargada],
+        (err, result) => err ? res.status(500).send(err) : res.send(result));
+});
+
+app.get("/bajas", (req, res) => {
+    const query = `
+      SELECT b.*, i.tipo_De_Equipo, i.Marca, i.Modelo 
+      FROM bajas b
+      LEFT JOIN inventario i ON b.id_inventario = i.id_inventario
+    `;
+    
+    db.query(query, (err, result) => {
+      if (err) res.status(500).send(err);
+      else res.send(result);
+    });
+});
+
+app.put("/bajas/update", (req, res) => {
+    const { id_bajas, id_inventario, motivo, fecha, persona_encargada } = req.body;
+    
+    db.query(`UPDATE bajas SET 
+        id_inventario=?, motivo=?, fecha=?, persona_encargada=?
+        WHERE id_bajas=?`,
+        [id_inventario, motivo, fecha, persona_encargada, id_bajas],
+        (err, result) => err ? res.status(500).send(err) : res.send(result));
+});
+
+app.delete("/bajas/delete/:id", (req, res) => {
+    const id = req.params.id;
+    db.query('DELETE FROM bajas WHERE id_bajas=?', id,
+        (err, result) => err ? res.status(500).send(err) : res.send(result));
+});
+
+
 
 
 // ------------------------- INICIAR SERVIDOR -------------------------
