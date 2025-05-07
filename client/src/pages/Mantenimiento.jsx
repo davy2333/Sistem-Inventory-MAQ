@@ -9,7 +9,6 @@ import Navbar from '../components/NavBar';
 function Mantenimiento() {
   const [mantenimientos, setMantenimientos] = useState([]);
   const [inventario, setInventario] = useState([]);
-  
   const [detalleProblema, setDetalleProblema] = useState("");
   const [tecnicoEncargado, setTecnicoEncargado] = useState("");
   const [estadoReparacion, setEstadoReparacion] = useState("");
@@ -18,6 +17,28 @@ function Mantenimiento() {
   const [idInventario, setIdInventario] = useState("");
   const [idMantenimiento, setIdMantenimiento] = useState();
   const [editar, setEditar] = useState(false);
+  const [busqueda, setBusqueda] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.classList.add('sidebar-expanded');
+    } else {
+      document.body.classList.remove('sidebar-expanded');
+    }
+  }, [sidebarOpen]);
+
+  useEffect(() => {
+    const handleSidebarToggle = (e) => {
+      setSidebarOpen(e.detail.isOpen);
+    };
+    
+    window.addEventListener('sidebarToggle', handleSidebarToggle);
+    
+    return () => {
+      window.removeEventListener('sidebarToggle', handleSidebarToggle);
+    };
+  }, []);
 
   useEffect(() => {
     getMantenimientos();
@@ -35,6 +56,21 @@ function Mantenimiento() {
       .then((res) => setInventario(res.data))
       .catch(err => console.error("Error al obtener inventario:", err));
   };
+
+  // Filtrar mantenimientos según la búsqueda
+  const mantenimientosFiltrados = mantenimientos.filter(mant => {
+    const equipo = inventario.find(i => i.id_inventario === mant.id_inventario);
+    const equipoInfo = equipo ? `${equipo.tipo_De_Equipo} ${equipo.Marca} ${equipo.Modelo}` : '';
+    
+    return (
+      equipoInfo.toLowerCase().includes(busqueda.toLowerCase()) ||
+      (mant.detalle_problema && mant.detalle_problema.toLowerCase().includes(busqueda.toLowerCase())) ||
+      (mant.tecnico_encargado && mant.tecnico_encargado.toLowerCase().includes(busqueda.toLowerCase())) ||
+      (mant.estado_de_reparacion && mant.estado_de_reparacion.toLowerCase().includes(busqueda.toLowerCase())) ||
+      (mant.Fecha && mant.Fecha.includes(busqueda)) ||
+      (mant.Costo && mant.Costo.toString().includes(busqueda))
+    );
+  });
 
   const LimpiarCampos = () => {
     setDetalleProblema("");
@@ -115,10 +151,39 @@ function Mantenimiento() {
     setCosto(val.Costo);
   };
 
+  // Estilo para el fondo gradiente
+  const backgroundStyle = {
+    background: 'linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%)',
+    minHeight: '100vh',
+    padding: '20px'
+  };
+
   return (
-    <>
+    <div style={backgroundStyle}>
       <Navbar />
-      <div className="container px-md-4 content">
+      <div className={`container px-md-4 content ${sidebarOpen ? 'sidebar-expanded' : ''}`}>
+        {/* Barra de búsqueda */}
+        <div className="row justify-content-center mb-4">
+          <div className="col-12 col-md-10">
+            <div className="card">
+              <div className="card-body p-3">
+                <div className="input-group">
+                  <span className="input-group-text bg-primary text-white">
+                    <i className="bi bi-search"></i>
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Buscar mantenimientos por equipo, problema, técnico, estado, fecha o costo..."
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="row justify-content-center">
           <div className="col-12 col-md-10">
             <div className="card text-center my-4">
@@ -225,7 +290,7 @@ function Mantenimiento() {
                   </tr>
                 </thead>
                 <tbody>
-                  {mantenimientos.map((val) => {
+                  {mantenimientosFiltrados.map((val) => {
                     const equipo = inventario.find(i => i.id_inventario === val.id_inventario);
                     return (
                       <tr key={val.id_mantenimiento}>
@@ -253,7 +318,7 @@ function Mantenimiento() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

@@ -21,6 +21,7 @@ function Pedidos() {
   const [tiposPrenda, setTiposPrenda] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [busqueda, setBusqueda] = useState("");
 
   // Efectos para el sidebar
   useEffect(() => {
@@ -79,6 +80,21 @@ function Pedidos() {
     getTiposPrenda();
     getClientes();
   }, []);
+
+  // Filtrar pedidos según el término de búsqueda
+  const filteredPedidos = pedidosList.filter(pedido => {
+    const tipoPrenda = tiposPrenda.find(t => t.id_tipo_prenda === pedido.id_tipo_prenda)?.tipo_prenda || '';
+    const cliente = clientes.find(c => c.id_cliente === pedido.id_cliente)?.Cliente || '';
+    
+    return (
+      pedido.Talla.toLowerCase().includes(busqueda.toLowerCase()) ||
+      pedido.cantidad_confeccionada.toString().includes(busqueda) ||
+      pedido.Estado.toLowerCase().includes(busqueda.toLowerCase()) ||
+      tipoPrenda.toLowerCase().includes(busqueda.toLowerCase()) ||
+      cliente.toLowerCase().includes(busqueda.toLowerCase()) ||
+      pedido.id_pedidos.toString().includes(busqueda)
+    );
+  });
 
   // Operaciones CRUD
   const add = () => {
@@ -210,204 +226,231 @@ function Pedidos() {
   return (
     <>
       <Navbar />
-      <div className={`container px-md-4 content ${sidebarOpen ? 'sidebar-expanded' : ''}`}>
-        <div className="row justify-content-center">
-          <div className="col-12 col-md-10">
-            <div className="card text-center my-4">
-              <div className="card-header bg-primary text-white">
-                <h1 className="h5 mb-0">REGISTRO DE PEDIDOS</h1>
-              </div>
-              <div className="card-body">
-                <div className="row">
-                  <div className="col-12 col-md-6 mb-3">
-                    <div className="input-group">
-                      <span className="input-group-text">Talla:</span>
-                      <input 
-                        type="text" 
-                        onChange={(e) => setTalla(e.target.value)}
-                        className="form-control" 
-                        value={talla} 
-                        placeholder="Ej: M, L, XL" 
-                      />
-                    </div>
-                  </div>
-
-                  <div className="col-12 col-md-6 mb-3">
-                    <div className="input-group">
-                      <span className="input-group-text">Cantidad:</span>
-                      <input 
-                        type="number" 
-                        onChange={(e) => setCantidad(e.target.value)}
-                        className="form-control" 
-                        value={cantidad} 
-                        placeholder="Cantidad de prendas" 
-                      />
-                    </div>
-                  </div>
-
-                  <div className="col-12 col-md-6 mb-3">
-                    <div className="input-group">
-                      <span className="input-group-text">Fecha Confección:</span>
-                      <input 
-                        type="date" 
-                        onChange={(e) => setFechaConfeccion(e.target.value)}
-                        className="form-control" 
-                        value={fechaConfeccion} 
-                      />
-                    </div>
-                  </div>
-
-                  <div className="col-12 col-md-6 mb-3">
-                    <div className="input-group">
-                      <span className="input-group-text">Fecha Entrega:</span>
-                      <input 
-                        type="date" 
-                        onChange={(e) => setFechaEntrega(e.target.value)}
-                        className="form-control" 
-                        value={fechaEntrega} 
-                      />
-                    </div>
-                  </div>
-
-                  <div className="col-12 col-md-6 mb-3">
-                    <div className="input-group">
-                      <span className="input-group-text">Costo por unidad:</span>
-                      <input 
-                        type="number" 
-                        step="0.01"
-                        onChange={(e) => setCosto(e.target.value)}
-                        className="form-control" 
-                        value={costo} 
-                        placeholder="Costo unitario" 
-                      />
-                    </div>
-                  </div>
-
-                  <div className="col-12 col-md-6 mb-3">
-                    <div className="input-group">
-                      <span className="input-group-text">Estado:</span>
-                      <select
-                        className="form-select"
-                        value={estado}
-                        onChange={(e) => setEstado(e.target.value)}
-                      >
-                        <option value="">Seleccione...</option>
-                        <option value="Pendiente">Pendiente</option>
-                        <option value="En proceso">En proceso</option>
-                        <option value="Terminado">Terminado</option>
-                        <option value="Entregado">Entregado</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="col-12 col-md-6 mb-3">
-                    <div className="input-group">
-                      <span className="input-group-text">Tipo de Prenda:</span>
-                      <select
-                        className="form-select"
-                        value={idTipoPrenda}
-                        onChange={(e) => setIdTipoPrenda(e.target.value)}
-                      >
-                        <option value="">Seleccione...</option>
-                        {tiposPrenda.map((tipo) => (
-                          <option key={tipo.id_tipo_prenda} value={tipo.id_tipo_prenda}>
-                            {tipo.tipo_prenda}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="col-12 col-md-6 mb-3">
-                    <div className="input-group">
-                      <span className="input-group-text">Cliente:</span>
-                      <select
-                        className="form-select"
-                        value={idCliente}
-                        onChange={(e) => setIdCliente(e.target.value)}
-                      >
-                        <option value="">Seleccione...</option>
-                        {clientes.map((cliente) => (
-                          <option key={cliente.id_cliente} value={cliente.id_cliente}>
-                            {cliente.Cliente}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+      <div style={{
+        background: 'linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%)',
+        minHeight: '100vh',
+        padding: '20px'
+      }}>
+        <div className={`container px-md-4 content ${sidebarOpen ? 'sidebar-expanded' : ''}`}>
+          {/* Barra de búsqueda similar a Proveedores */}
+          <div className="row justify-content-center mb-4">
+            <div className="col-12 col-md-10">
+              <div className="card">
+                <div className="card-body p-3">
+                  <div className="input-group">
+                    <span className="input-group-text bg-primary text-white">
+                      <i className="bi bi-search"></i>
+                    </span>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Buscar pedidos por ID, talla, cantidad, estado, tipo de prenda o cliente..."
+                      value={busqueda}
+                      onChange={(e) => setBusqueda(e.target.value)}
+                    />
                   </div>
                 </div>
               </div>
-              <div className="card-footer text-muted">
-                {editar ? (
-                  <div>
-                    <button className='btn btn-warning m-2' onClick={update}>Actualizar</button> 
-                    <button className='btn btn-info m-2' onClick={LimpiarCampos}>Cancelar</button>
+            </div>
+          </div>
+
+          <div className="row justify-content-center">
+            <div className="col-12 col-md-10">
+              <div className="card text-center my-4">
+                <div className="card-header bg-primary text-white">
+                  <h1 className="h5 mb-0">REGISTRO DE PEDIDOS</h1>
+                </div>
+                <div className="card-body">
+                  <div className="row">
+                    <div className="col-12 col-md-6 mb-3">
+                      <div className="input-group">
+                        <span className="input-group-text">Talla:</span>
+                        <input 
+                          type="text" 
+                          onChange={(e) => setTalla(e.target.value)}
+                          className="form-control" 
+                          value={talla} 
+                          placeholder="Ej: M, L, XL" 
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-12 col-md-6 mb-3">
+                      <div className="input-group">
+                        <span className="input-group-text">Cantidad:</span>
+                        <input 
+                          type="number" 
+                          onChange={(e) => setCantidad(e.target.value)}
+                          className="form-control" 
+                          value={cantidad} 
+                          placeholder="Cantidad de prendas" 
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-12 col-md-6 mb-3">
+                      <div className="input-group">
+                        <span className="input-group-text">Fecha Confección:</span>
+                        <input 
+                          type="date" 
+                          onChange={(e) => setFechaConfeccion(e.target.value)}
+                          className="form-control" 
+                          value={fechaConfeccion} 
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-12 col-md-6 mb-3">
+                      <div className="input-group">
+                        <span className="input-group-text">Fecha Entrega:</span>
+                        <input 
+                          type="date" 
+                          onChange={(e) => setFechaEntrega(e.target.value)}
+                          className="form-control" 
+                          value={fechaEntrega} 
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-12 col-md-6 mb-3">
+                      <div className="input-group">
+                        <span className="input-group-text">Costo por unidad:</span>
+                        <input 
+                          type="number" 
+                          step="0.01"
+                          onChange={(e) => setCosto(e.target.value)}
+                          className="form-control" 
+                          value={costo} 
+                          placeholder="Costo unitario" 
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-12 col-md-6 mb-3">
+                      <div className="input-group">
+                        <span className="input-group-text">Estado:</span>
+                        <select
+                          className="form-select"
+                          value={estado}
+                          onChange={(e) => setEstado(e.target.value)}
+                        >
+                          <option value="">Seleccione...</option>
+                          <option value="Pendiente">Pendiente</option>
+                          <option value="En proceso">En proceso</option>
+                          <option value="Terminado">Terminado</option>
+                          <option value="Entregado">Entregado</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="col-12 col-md-6 mb-3">
+                      <div className="input-group">
+                        <span className="input-group-text">Tipo de Prenda:</span>
+                        <select
+                          className="form-select"
+                          value={idTipoPrenda}
+                          onChange={(e) => setIdTipoPrenda(e.target.value)}
+                        >
+                          <option value="">Seleccione...</option>
+                          {tiposPrenda.map((tipo) => (
+                            <option key={tipo.id_tipo_prenda} value={tipo.id_tipo_prenda}>
+                              {tipo.tipo_prenda}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="col-12 col-md-6 mb-3">
+                      <div className="input-group">
+                        <span className="input-group-text">Cliente:</span>
+                        <select
+                          className="form-select"
+                          value={idCliente}
+                          onChange={(e) => setIdCliente(e.target.value)}
+                        >
+                          <option value="">Seleccione...</option>
+                          {clientes.map((cliente) => (
+                            <option key={cliente.id_cliente} value={cliente.id_cliente}>
+                              {cliente.Cliente}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
                   </div>
-                ) : (
-                  <button className='btn btn-success' onClick={add}>Registrar</button>
-                )}
+                </div>
+                <div className="card-footer text-muted">
+                  {editar ? (
+                    <div>
+                      <button className='btn btn-warning m-2' onClick={update}>Actualizar</button> 
+                      <button className='btn btn-info m-2' onClick={LimpiarCampos}>Cancelar</button>
+                    </div>
+                  ) : (
+                    <button className='btn btn-success' onClick={add}>Registrar</button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="row justify-content-center">
-          <div className="col-12">
-            <div className="table-responsive">
-              <table className="table table-striped table-hover">
-                <thead className="table-dark">
-                  <tr>
-                    <th>ID</th>
-                    <th>Talla</th>
-                    <th>Cantidad</th>
-                    <th>Fecha Confección</th>
-                    <th>Fecha Entrega</th>
-                    <th>Costo Unitario</th>
-                    <th>Estado</th>
-                    <th>Tipo Prenda</th>
-                    <th>Cliente</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pedidosList.map((val) => {
-                    const tipoPrenda = tiposPrenda.find(t => t.id_tipo_prenda === val.id_tipo_prenda)?.tipo_prenda || '';
-                    const cliente = clientes.find(c => c.id_cliente === val.id_cliente)?.Cliente || '';
-                    
-                    return (
-                      <tr key={val.id_pedidos}>
-                        <td>{val.id_pedidos}</td>
-                        <td>{val.Talla}</td>
-                        <td>{val.cantidad_confeccionada}</td>
-                        <td>{new Date(val.fecha_de_confeccion).toLocaleDateString()}</td>
-                        <td>{new Date(val.Fecha_estimada_de_entrega).toLocaleDateString()}</td>
-                        <td>${val.costo_por_unidad}</td>
-                        <td>{val.Estado}</td>
-                        <td>{tipoPrenda}</td>
-                        <td>{cliente}</td>
-                        <td>
-                          <div className="btn-group" role="group">
-                            <button 
-                              type="button" 
-                              onClick={() => editarPedido(val)}
-                              className="btn btn-info btn-sm text-white"
-                            >
-                              Editar
-                            </button>
-                            <button 
-                              type="button" 
-                              onClick={() => deletePedido(val)}  
-                              className="btn btn-danger btn-sm"
-                            >
-                              Eliminar
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+          <div className="row justify-content-center">
+            <div className="col-12">
+              <div className="table-responsive">
+                <table className="table table-striped table-hover">
+                  <thead className="table-dark">
+                    <tr>
+                      <th>ID</th>
+                      <th>Talla</th>
+                      <th>Cantidad</th>
+                      <th>Fecha Confección</th>
+                      <th>Fecha Entrega</th>
+                      <th>Costo Unitario</th>
+                      <th>Estado</th>
+                      <th>Tipo Prenda</th>
+                      <th>Cliente</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredPedidos.map((val) => {
+                      const tipoPrenda = tiposPrenda.find(t => t.id_tipo_prenda === val.id_tipo_prenda)?.tipo_prenda || '';
+                      const cliente = clientes.find(c => c.id_cliente === val.id_cliente)?.Cliente || '';
+                      
+                      return (
+                        <tr key={val.id_pedidos}>
+                          <td>{val.id_pedidos}</td>
+                          <td>{val.Talla}</td>
+                          <td>{val.cantidad_confeccionada}</td>
+                          <td>{new Date(val.fecha_de_confeccion).toLocaleDateString()}</td>
+                          <td>{new Date(val.Fecha_estimada_de_entrega).toLocaleDateString()}</td>
+                          <td>${val.costo_por_unidad}</td>
+                          <td>{val.Estado}</td>
+                          <td>{tipoPrenda}</td>
+                          <td>{cliente}</td>
+                          <td>
+                            <div className="btn-group" role="group">
+                              <button 
+                                type="button" 
+                                onClick={() => editarPedido(val)}
+                                className="btn btn-info btn-sm text-white"
+                              >
+                                Editar
+                              </button>
+                              <button 
+                                type="button" 
+                                onClick={() => deletePedido(val)}  
+                                className="btn btn-danger btn-sm">
+                                Eliminar
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>

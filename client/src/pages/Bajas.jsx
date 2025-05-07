@@ -156,7 +156,7 @@ function Bajas() {
   const editarBaja = (val) => {
     setEditar(true);
     setMotivo(val.motivo);
-    setFecha(val.fecha.split('T')[0]); // Formatear fecha para input type="date"
+    setFecha(val.fecha.split('T')[0]);
     setPersonaEncargada(val.persona_encargada);
     setIdInventario(val.id_inventario);
     setIdBajas(val.id_bajas);
@@ -170,128 +170,135 @@ function Bajas() {
   return (
     <>
       <Navbar />
-      <div className={`container px-md-4 content ${sidebarOpen ? 'sidebar-expanded' : ''}`}>
-        <div className="row justify-content-center">
-          <div className="col-12 col-md-10">
-            <div className="card text-center my-4">
-              <div className="card-header bg-primary text-white">
-                <h1 className="h5 mb-0">REGISTRO DE BAJAS</h1>
-              </div>
-              <div className="card-body">
-                <div className="row">
-                  <div className="col-12 col-md-6 mb-3">
-                    <div className="input-group">
-                      <span className="input-group-text">Equipo:</span>
-                      <select
-                        className="form-control"
-                        value={idInventario}
-                        onChange={(event) => setIdInventario(event.target.value)}
-                      >
-                        <option value="">Seleccione un equipo</option>
-                        {inventarioList.map((item) => (
-                          <option key={item.id_inventario} value={item.id_inventario}>
-                            {item.tipo_De_Equipo} - {item.Marca} {item.Modelo}
-                          </option>
-                        ))}
-                      </select>
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%)',
+        padding: '20px',
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+      }}>
+        <div className={`container px-md-4 content ${sidebarOpen ? 'sidebar-expanded' : ''}`}>
+          <div className="row justify-content-center">
+            <div className="col-12 col-md-10">
+              <div className="card text-center my-4">
+                <div className="card-header bg-primary text-white">
+                  <h1 className="h5 mb-0">REGISTRO DE BAJAS</h1>
+                </div>
+                <div className="card-body">
+                  <div className="row">
+                    <div className="col-12 col-md-6 mb-3">
+                      <div className="input-group">
+                        <span className="input-group-text">Equipo:</span>
+                        <select
+                          className="form-control"
+                          value={idInventario}
+                          onChange={(event) => setIdInventario(event.target.value)}
+                        >
+                          <option value="">Seleccione un equipo</option>
+                          {inventarioList.map((item) => (
+                            <option key={item.id_inventario} value={item.id_inventario}>
+                              {item.tipo_De_Equipo} - {item.Marca} {item.Modelo}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="col-12 col-md-6 mb-3">
-                    <div className="input-group">
-                      <span className="input-group-text">Motivo:</span>
-                      <input 
-                        type="text" 
-                        onChange={(event) => setMotivo(event.target.value)}
-                        className="form-control" 
-                        value={motivo} 
-                        placeholder="Ingrese el motivo de la baja" 
-                      />
+                    <div className="col-12 col-md-6 mb-3">
+                      <div className="input-group">
+                        <span className="input-group-text">Motivo:</span>
+                        <input 
+                          type="text" 
+                          onChange={(event) => setMotivo(event.target.value)}
+                          className="form-control" 
+                          value={motivo} 
+                          placeholder="Ingrese el motivo de la baja" 
+                        />
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="col-12 col-md-6 mb-3">
-                    <div className="input-group">
-                      <span className="input-group-text">Fecha:</span>
-                      <input 
-                        type="date" 
-                        value={fecha}
-                        onChange={(event) => setFecha(event.target.value)}
-                        className="form-control"  
-                      />
+                    <div className="col-12 col-md-6 mb-3">
+                      <div className="input-group">
+                        <span className="input-group-text">Fecha:</span>
+                        <input 
+                          type="date" 
+                          value={fecha}
+                          onChange={(event) => setFecha(event.target.value)}
+                          className="form-control"  
+                        />
+                      </div>
                     </div>
-                  </div>
-              
-                  <div className="col-12 col-md-6 mb-3">
-                    <div className="input-group">
-                      <span className="input-group-text">Encargado:</span>
-                      <input 
-                        type="text" 
-                        onChange={(event) => setPersonaEncargada(event.target.value)}
-                        className="form-control" 
-                        value={personaEncargada} 
-                        placeholder="Persona encargada" 
-                      />
+                
+                    <div className="col-12 col-md-6 mb-3">
+                      <div className="input-group">
+                        <span className="input-group-text">Encargado:</span>
+                        <input 
+                          type="text" 
+                          onChange={(event) => setPersonaEncargada(event.target.value)}
+                          className="form-control" 
+                          value={personaEncargada} 
+                          placeholder="Persona encargada" 
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="card-footer text-muted">
-                {editar ? (
-                  <div>
-                    <button className='btn btn-warning m-2' onClick={update}>Actualizar</button> 
-                    <button className='btn btn-info m-2' onClick={LimpiarCampos}>Cancelar</button>
-                  </div>
-                ) : (
-                  <button className='btn btn-success' onClick={add}>Registrar</button>
-                )}
+                <div className="card-footer text-muted">
+                  {editar ? (
+                    <div>
+                      <button className='btn btn-warning m-2' onClick={update}>Actualizar</button> 
+                      <button className='btn btn-info m-2' onClick={LimpiarCampos}>Cancelar</button>
+                    </div>
+                  ) : (
+                    <button className='btn btn-success' onClick={add}>Registrar</button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="row justify-content-center">
-          <div className="col-12">
-            <div className="table-responsive">
-              <table className="table table-striped table-hover">
-                <thead className="table-dark">
-                  <tr>
-                    <th scope="col">Equipo</th>
-                    <th scope="col">Motivo</th>
-                    <th scope="col">Fecha</th>
-                    <th scope="col">Encargado</th>
-                    <th scope="col">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bajasList.map((val) => (
-                    <tr key={val.id_bajas}>
-                      <td>{getEquipoInfo(val.id_inventario)}</td>
-                      <td>{val.motivo}</td>
-                      <td>{new Date(val.fecha).toLocaleDateString()}</td>
-                      <td>{val.persona_encargada}</td>
-                      <td>
-                        <div className="btn-group" role="group">
-                          <button 
-                            type="button" 
-                            onClick={() => editarBaja(val)}
-                            className="btn btn-info btn-sm text-white"
-                          >
-                            Editar
-                          </button>
-                          <button 
-                            type="button" 
-                            onClick={() => deleteBaja(val)}  
-                            className="btn btn-danger btn-sm"
-                          >
-                            Eliminar
-                          </button>
-                        </div>
-                      </td>
+          <div className="row justify-content-center">
+            <div className="col-12">
+              <div className="table-responsive">
+                <table className="table table-striped table-hover">
+                  <thead className="table-dark">
+                    <tr>
+                      <th scope="col">Equipo</th>
+                      <th scope="col">Motivo</th>
+                      <th scope="col">Fecha</th>
+                      <th scope="col">Encargado</th>
+                      <th scope="col">Acciones</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {bajasList.map((val) => (
+                      <tr key={val.id_bajas}>
+                        <td>{getEquipoInfo(val.id_inventario)}</td>
+                        <td>{val.motivo}</td>
+                        <td>{new Date(val.fecha).toLocaleDateString()}</td>
+                        <td>{val.persona_encargada}</td>
+                        <td>
+                          <div className="btn-group" role="group">
+                            <button 
+                              type="button" 
+                              onClick={() => editarBaja(val)}
+                              className="btn btn-info btn-sm text-white"
+                            >
+                              Editar
+                            </button>
+                            <button 
+                              type="button" 
+                              onClick={() => deleteBaja(val)}  
+                              className="btn btn-danger btn-sm"
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>

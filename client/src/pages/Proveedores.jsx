@@ -15,6 +15,7 @@ function App() {
   const [editar, setEditar] = useState(false);
   const [proveedoresList, setProveedores] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
     if (sidebarOpen) {
@@ -49,6 +50,16 @@ function App() {
   useEffect(() => {
     getProveedores();
   }, []);
+
+  // Filtrar proveedores según la búsqueda
+  const proveedoresFiltrados = proveedoresList.filter(proveedor => {
+    return (
+      proveedor.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+      proveedor.empresa.toLowerCase().includes(busqueda.toLowerCase()) ||
+      (proveedor.direccion && proveedor.direccion.toLowerCase().includes(busqueda.toLowerCase())) ||
+      (proveedor.Numero_telefonico && proveedor.Numero_telefonico.toString().includes(busqueda))
+    );
+  });
 
   const add = () => {
     Axios.post("http://localhost:3001/create", {
@@ -150,10 +161,39 @@ function App() {
     setId(val.id_proveedores);
   }
 
+  // Estilo para el fondo gradiente
+  const backgroundStyle = {
+    background: 'linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%)',
+    minHeight: '100vh',
+    padding: '20px'
+  };
+
   return (
-    <>
+    <div style={backgroundStyle}>
       <Navbar />
       <div className={`container px-md-4 content ${sidebarOpen ? 'sidebar-expanded' : ''}`}>
+        {/* Barra de búsqueda */}
+        <div className="row justify-content-center mb-4">
+          <div className="col-12 col-md-10">
+            <div className="card">
+              <div className="card-body p-3">
+                <div className="input-group">
+                  <span className="input-group-text bg-primary text-white">
+                    <i className="bi bi-search"></i>
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Buscar proveedores por nombre, empresa, dirección o teléfono..."
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="row justify-content-center">
           <div className="col-12 col-md-10">
             <div className="card text-center my-4">
@@ -243,7 +283,7 @@ function App() {
                   </tr>
                 </thead>
                 <tbody>
-                  {proveedoresList.map((val) => (
+                  {proveedoresFiltrados.map((val) => (
                     <tr key={val.id_proveedores}>
                       <td>{val.nombre}</td>
                       <td>{val.direccion}</td>
@@ -275,7 +315,7 @@ function App() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

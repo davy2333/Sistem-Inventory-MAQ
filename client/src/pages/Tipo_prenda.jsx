@@ -12,6 +12,29 @@ function TipoPrenda() {
   const [editar, setEditar] = useState(false);
   const [tiposPrendaList, setTiposPrenda] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [busqueda, setBusqueda] = useState("");
+
+  // Estilos para el fondo gradiente y contenido (igual que Home)
+  const containerStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    background: 'linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%)',
+    padding: '20px',
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+  };
+
+  const contentStyle = {
+    maxWidth: '1000px',
+    width: '100%',
+    background: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: '16px',
+    padding: '40px',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+    backdropFilter: 'blur(4px)',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+  };
 
   useEffect(() => {
     if (sidebarOpen) {
@@ -47,6 +70,14 @@ function TipoPrenda() {
     getTiposPrenda();
   }, []);
 
+  // Filtrar tipos de prenda según la búsqueda
+  const tiposPrendaFiltrados = tiposPrendaList.filter(tipo => {
+    return (
+      tipo.tipo_prenda.toLowerCase().includes(busqueda.toLowerCase()) ||
+      (tipo.id_tipo_prenda && tipo.id_tipo_prenda.toString().includes(busqueda))
+    );
+  });
+
   const add = () => {
     Axios.post("http://localhost:3001/tipoprenda/create", {
       tipo_prenda: tipoPrenda
@@ -59,13 +90,13 @@ function TipoPrenda() {
           html: `<i>El tipo de prenda <strong>${tipoPrenda}</strong> fue registrado con éxito!!</i>`,
           icon: 'success',
           timer: 3000
-        })
-      }).catch(function(error){
+        });
+      }).catch(function(error) {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente más tarde":JSON.parse(JSON.stringify(error)).message
-        })
+          text: JSON.parse(JSON.stringify(error)).message === "Network Error" ? "Intente más tarde" : JSON.parse(JSON.stringify(error)).message
+        });
       });
   }
 
@@ -82,13 +113,13 @@ function TipoPrenda() {
           html: `<i>El tipo de prenda <strong>${tipoPrenda}</strong> fue actualizado con éxito!!</i>`,
           icon: 'success',
           timer: 3000
-        })
-      }).catch(function(error){
+        });
+      }).catch(function(error) {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente más tarde":JSON.parse(JSON.stringify(error)).message
-        })
+          text: JSON.parse(JSON.stringify(error)).message === "Network Error" ? "Intente más tarde" : JSON.parse(JSON.stringify(error)).message
+        });
       });
   }
 
@@ -112,13 +143,13 @@ function TipoPrenda() {
             icon: "success",
             timer: 850
           });
-        }).catch(function(error){
+        }).catch(function(error) {
           Swal.fire({
             icon: "error",
             title: "Oops...",
             text: "No se logró eliminar el tipo de prenda",
-            footer: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente más tarde":JSON.parse(JSON.stringify(error)).message
-          })
+            footer: JSON.parse(JSON.stringify(error)).message === "Network Error" ? "Intente más tarde" : JSON.parse(JSON.stringify(error)).message
+          });
         });
       }
     });
@@ -136,9 +167,31 @@ function TipoPrenda() {
   }
 
   return (
-    <>
+    <div style={containerStyle}>
       <Navbar />
-      <div className={`container px-md-4 content ${sidebarOpen ? 'sidebar-expanded' : ''}`}>
+      <div style={contentStyle} className={`container px-md-4 content ${sidebarOpen ? 'sidebar-expanded' : ''}`}>
+        {/* Barra de búsqueda */}
+        <div className="row justify-content-center mb-4">
+          <div className="col-12 col-md-10">
+            <div className="card">
+              <div className="card-body p-3">
+                <div className="input-group">
+                  <span className="input-group-text bg-primary text-white">
+                    <i className="bi bi-search"></i>
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Buscar tipos de prenda por nombre o ID..."
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="row justify-content-center">
           <div className="col-12 col-md-10">
             <div className="card text-center my-4">
@@ -187,7 +240,7 @@ function TipoPrenda() {
                   </tr>
                 </thead>
                 <tbody>
-                  {tiposPrendaList.map((val) => (
+                  {tiposPrendaFiltrados.map((val) => (
                     <tr key={val.id_tipo_prenda}>
                       <td>{val.id_tipo_prenda}</td>
                       <td>{val.tipo_prenda}</td>
@@ -217,7 +270,7 @@ function TipoPrenda() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

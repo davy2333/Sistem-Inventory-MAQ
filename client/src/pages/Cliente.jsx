@@ -14,6 +14,7 @@ function Cliente() {
   const [editar, setEditar] = useState(false);
   const [clientesList, setClientes] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
     if (sidebarOpen) {
@@ -48,6 +49,15 @@ function Cliente() {
   useEffect(() => {
     getClientes();
   }, []);
+
+  // Filtrar clientes según la búsqueda
+  const clientesFiltrados = clientesList.filter(cli => {
+    return (
+      cli.Cliente.toLowerCase().includes(busqueda.toLowerCase()) ||
+      (cli.numero_telefonico && cli.numero_telefonico.toString().includes(busqueda)) ||
+      (cli.Email && cli.Email.toLowerCase().includes(busqueda.toLowerCase()))
+    );
+  });
 
   const add = () => {
     Axios.post("http://localhost:3001/clientes/create", {
@@ -155,10 +165,39 @@ function Cliente() {
     setIdCliente(val.id_cliente);
   };
 
+  // Estilo para el fondo gradiente
+  const backgroundStyle = {
+    background: 'linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%)',
+    minHeight: '100vh',
+    padding: '20px'
+  };
+
   return (
-    <>
+    <div style={backgroundStyle}>
       <Navbar />
       <div className={`container px-md-4 content ${sidebarOpen ? 'sidebar-expanded' : ''}`}>
+        {/* Barra de búsqueda */}
+        <div className="row justify-content-center mb-4">
+          <div className="col-12 col-md-10">
+            <div className="card">
+              <div className="card-body p-3">
+                <div className="input-group">
+                  <span className="input-group-text bg-primary text-white">
+                    <i className="bi bi-search"></i>
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Buscar clientes por nombre, teléfono o email..."
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="row justify-content-center">
           <div className="col-12 col-md-10">
             <div className="card text-center my-4">
@@ -234,7 +273,7 @@ function Cliente() {
                   </tr>
                 </thead>
                 <tbody>
-                  {clientesList.map((val) => (
+                  {clientesFiltrados.map((val) => (
                     <tr key={val.id_cliente}>
                       <td>{val.Cliente}</td>
                       <td>{val.numero_telefonico}</td>
@@ -265,7 +304,7 @@ function Cliente() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

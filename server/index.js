@@ -164,8 +164,6 @@ app.get("/clientes", (req, res) => {
 });
 
 
-
-
 // ------------------------- CRUD CLIENTES -------------------------
 app.post("/clientes/create", (req, res) => {
     const { Cliente, numero_telefonico, Email } = req.body;
@@ -247,7 +245,6 @@ app.get('/inventario', (req, res) => {
       }
     });
   });
-
 
 // ------------------------- CRUD MANTENIMIENTO -------------------------
 app.post("/mantenimiento/create", (req, res) => {
@@ -331,6 +328,85 @@ app.delete("/bajas/delete/:id", (req, res) => {
 });
 
 
+// ------------------------- CRUD HISTORIAL DE COMPRAS -------------------------
+app.post("/historial/create", (req, res) => {
+  const { id_inventario, fecha_compra, costo, proveedor } = req.body;
+  
+  // Validación de campos requeridos
+  if (!id_inventario || !fecha_compra || !costo) {
+      return res.status(400).send({ message: "Todos los campos son requeridos" });
+  }
+  
+  db.query(`INSERT INTO historial_de_compras 
+      (id_inventario, fecha_compra, costo, proveedor)
+      VALUES (?, ?, ?, ?)`,
+      [id_inventario, fecha_compra, costo, proveedor || null],
+      (err, result) => {
+          if (err) {
+              console.error(err);
+              res.status(500).send(err);
+          } else {
+              res.send(result);
+          }
+      });
+});
+
+app.get("/historial", (req, res) => {
+  const query = `
+    SELECT h.*, 
+           i.tipo_De_Equipo, i.Marca, i.Modelo,
+           p.nombre as nombre_proveedor, p.empresa
+    FROM historial_de_compras h
+    LEFT JOIN inventario i ON h.id_inventario = i.id_inventario
+    LEFT JOIN proveedores p ON h.proveedor = p.id_proveedores
+    ORDER BY h.fecha_compra DESC
+  `;
+  
+  db.query(query, (err, result) => {
+      if (err) {
+          console.error(err);
+          res.status(500).send(err);
+      } else {
+          res.send(result);
+      }
+  });
+});
+
+app.put("/historial/update", (req, res) => {
+  const { id_historial, id_inventario, fecha_compra, costo, proveedor } = req.body;
+  
+  // Validación de campos requeridos
+  if (!id_inventario || !fecha_compra || !costo) {
+      return res.status(400).send({ message: "Todos los campos son requeridos" });
+  }
+  
+  db.query(`UPDATE historial_de_compras SET 
+      id_inventario=?, fecha_compra=?, costo=?, proveedor=?
+      WHERE id_historial=?`,
+      [id_inventario, fecha_compra, costo, proveedor || null, id_historial],
+      (err, result) => {
+          if (err) {
+              console.error(err);
+              res.status(500).send(err);
+          } else {
+              res.send(result);
+          }
+      });
+});
+
+app.delete("/historial/delete/:id", (req, res) => {
+  const id = req.params.id;
+  
+  db.query('DELETE FROM historial_de_compras WHERE id_historial=?', id,
+      (err, result) => {
+          if (err) {
+              console.error(err);
+              res.status(500).send(err);
+          } else {
+              res.send(result);
+          }
+      });
+});
 
 
 // ------------------------- INICIAR SERVIDOR -------------------------
