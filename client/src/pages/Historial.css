@@ -1,0 +1,33 @@
+.historial-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .historial-list {
+    margin-top: 20px;
+  }
+  
+  .historial-item {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .historial-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .equipo-nombre {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .fecha {
+    color: #666;
+    font-size: 0.9em;
+  }

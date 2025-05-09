@@ -10,7 +10,7 @@ function Inventario() {
   const [tipoDeEquipo, setTipoDeEquipo] = useState("");
   const [marca, setMarca] = useState("");
   const [modelo, setModelo] = useState("");
-  const [precio, setPrecio] = useState(0);
+  const [precio, setPrecio] = useState("");
   const [fechaDeAdquisicion, setFechaDeAdquisicion] = useState("");
   const [condicion, setCondicion] = useState("");
   const [codigo, setCodigo] = useState("");
@@ -21,29 +21,6 @@ function Inventario() {
   const [proveedoresList, setProveedores] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [busqueda, setBusqueda] = useState("");
-
-  // Estilos para el fondo gradiente y contenido (igual que Home)
-  const containerStyle = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-    background: 'linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%)',
-    padding: '20px',
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-  };
-
-  const contentStyle = {
-    maxWidth: '100%',
-    width: '100%',
-    background: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: '16px',
-    padding: '40px',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-    backdropFilter: 'blur(4px)',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    margin: '20px',
-  };
 
   useEffect(() => {
     if (sidebarOpen) {
@@ -90,18 +67,14 @@ function Inventario() {
     getProveedores();
   }, []);
 
+  // Filtrar inventario según la búsqueda
   const inventarioFiltrado = inventarioList.filter(item => {
-    const proveedor = proveedoresList.find(p => p.id_proveedores === item.id_proveedores);
-    const proveedorInfo = proveedor ? `${proveedor.nombre} ${proveedor.empresa}` : '';
-    
     return (
       item.tipo_De_Equipo.toLowerCase().includes(busqueda.toLowerCase()) ||
-      item.Marca.toLowerCase().includes(busqueda.toLowerCase()) ||
-      item.Modelo.toLowerCase().includes(busqueda.toLowerCase()) ||
-      (item.Precio && item.Precio.toString().includes(busqueda)) ||
-      (item.Condicion && item.Condicion.toLowerCase().includes(busqueda.toLowerCase())) ||
-      (item.Codigo && item.Codigo.toLowerCase().includes(busqueda.toLowerCase())) ||
-      (proveedorInfo.toLowerCase().includes(busqueda.toLowerCase()))
+      (item.Marca && item.Marca.toLowerCase().includes(busqueda.toLowerCase())) ||
+      (item.Modelo && item.Modelo.toLowerCase().includes(busqueda.toLowerCase())) ||
+      (item.Codigo && item.Codigo.toString().includes(busqueda)) ||
+      (item.Condicion && item.Condicion.toLowerCase().includes(busqueda.toLowerCase()))
     );
   });
 
@@ -121,7 +94,7 @@ function Inventario() {
         LimpiarCampos();
         Swal.fire({
           title: "<strong>Registro exitoso!!</strong>",
-          html: `<i>El equipo <strong>${tipoDeEquipo} - ${marca}</strong> fue registrado con éxito!!</i>`,
+          html: `<i>El equipo <strong>${tipoDeEquipo}</strong> fue registrado con éxito!!</i>`,
           icon: 'success',
           timer: 3000
         });
@@ -132,7 +105,7 @@ function Inventario() {
           text: JSON.parse(JSON.stringify(error)).message === "Network Error" ? "Intente más tarde" : JSON.parse(JSON.stringify(error)).message
         });
       });
-  }
+  };
 
   const update = () => {
     Axios.put("http://localhost:3001/update-inventario", {
@@ -151,7 +124,7 @@ function Inventario() {
         LimpiarCampos();
         Swal.fire({
           title: "<strong>Actualización exitosa!!</strong>",
-          html: `<i>El equipo <strong>${tipoDeEquipo} - ${marca}</strong> fue actualizado con éxito!!</i>`,
+          html: `<i>El equipo <strong>${tipoDeEquipo}</strong> fue actualizado con éxito!!</i>`,
           icon: 'success',
           timer: 3000
         });
@@ -162,25 +135,25 @@ function Inventario() {
           text: JSON.parse(JSON.stringify(error)).message === "Network Error" ? "Intente más tarde" : JSON.parse(JSON.stringify(error)).message
         });
       });
-  }
+  };
 
   const deleteItem = (val) => {
     Swal.fire({
-      title: "Confirmar?",
-      html: `<i>Realmente desea eliminar el equipo <strong>${val.tipo_De_Equipo} - ${val.Marca}</strong>?</i>`,
+      title: "¿Confirmar?",
+      html: `<i>¿Realmente desea eliminar el equipo <strong>${val.tipo_De_Equipo}</strong>?</i>`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Si, eliminarlo!"
+      confirmButtonText: "¡Sí, eliminarlo!"
     }).then((result) => {
       if (result.isConfirmed) {
         Axios.delete(`http://localhost:3001/delete-inventario/${val.id_inventario}`).then(() => {
           getInventario();
           LimpiarCampos();
           Swal.fire({
-            title: "Eliminado!",
-            text: `${val.tipo_De_Equipo} - ${val.Marca} fue eliminado`,
+            title: "¡Eliminado!",
+            text: `${val.tipo_De_Equipo} fue eliminado`,
             icon: "success",
             timer: 850
           });
@@ -194,19 +167,19 @@ function Inventario() {
         });
       }
     });
-  }
+  };
 
   const LimpiarCampos = () => {
     setTipoDeEquipo("");
     setMarca("");
     setModelo("");
-    setPrecio(0);
+    setPrecio("");
     setFechaDeAdquisicion("");
     setCondicion("");
     setCodigo("");
     setIdProveedor("");
     setEditar(false);
-  }     
+  };
 
   const editarItem = (val) => {
     setEditar(true);
@@ -219,13 +192,20 @@ function Inventario() {
     setCodigo(val.Codigo);
     setIdProveedor(val.id_proveedores);
     setIdInventario(val.id_inventario);
-  }
+  };
+
+  // Estilo para el fondo gradiente
+  const backgroundStyle = {
+    background: 'linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%)',
+    minHeight: '100vh',
+    padding: '20px'
+  };
 
   return (
-    <div style={containerStyle}>
+    <div style={backgroundStyle}>
       <Navbar />
-      <div style={contentStyle} className={`container px-md-4 content ${sidebarOpen ? 'sidebar-expanded' : ''}`}>
-        {/* Barra de búsqueda idéntica a Proveedores */}
+      <div className={`container px-md-4 content ${sidebarOpen ? 'sidebar-expanded' : ''}`}>
+        {/* Barra de búsqueda */}
         <div className="row justify-content-center mb-4">
           <div className="col-12 col-md-10">
             <div className="card">
@@ -237,7 +217,7 @@ function Inventario() {
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Buscar equipos por tipo, marca, modelo, precio, condición, código o proveedor..."
+                    placeholder="Buscar equipos por tipo, marca, modelo, código o condición..."
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                   />
@@ -251,12 +231,121 @@ function Inventario() {
           <div className="col-12 col-md-10">
             <div className="card text-center my-4">
               <div className="card-header bg-primary text-white">
-                <h1 className="h5 mb-0">INVENTARIO DE EQUIPOS</h1>
+                <h1 className="h5 mb-0">INVENTARIO</h1>
               </div>
               <div className="card-body">
                 <div className="row">
-                  {/* Resto del formulario permanece igual */}
-                  {/* ... */}
+                  <div className="col-12 col-md-6 mb-3">
+                    <div className="input-group">
+                      <span className="input-group-text">Tipo de Equipo:</span>
+                      <input 
+                        type="text" 
+                        onChange={(event) => setTipoDeEquipo(event.target.value)}
+                        className="form-control" 
+                        value={tipoDeEquipo} 
+                        placeholder="Ingrese el tipo de equipo" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-12 col-md-6 mb-3">
+                    <div className="input-group">
+                      <span className="input-group-text">Marca:</span>
+                      <input 
+                        type="text" 
+                        onChange={(event) => setMarca(event.target.value)}
+                        className="form-control" 
+                        value={marca} 
+                        placeholder="Ingrese la marca" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-12 col-md-6 mb-3">
+                    <div className="input-group">
+                      <span className="input-group-text">Modelo:</span>
+                      <input 
+                        type="text" 
+                        value={modelo}
+                        onChange={(event) => setModelo(event.target.value)}
+                        className="form-control"  
+                        placeholder="Ingrese el modelo" 
+                      />
+                    </div>
+                  </div>
+              
+                  <div className="col-12 col-md-6 mb-3">
+                    <div className="input-group">
+                      <span className="input-group-text">Precio:</span>
+                      <input 
+                        type="number" 
+                        onChange={(event) => setPrecio(event.target.value)}
+                        className="form-control" 
+                        value={precio} 
+                        placeholder="Ingrese el precio" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-12 col-md-6 mb-3">
+                    <div className="input-group">
+                      <span className="input-group-text">Fecha Adquisición:</span>
+                      <input 
+                        type="date" 
+                        onChange={(event) => setFechaDeAdquisicion(event.target.value)}
+                        className="form-control" 
+                        value={fechaDeAdquisicion} 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-12 col-md-6 mb-3">
+                    <div className="input-group">
+                      <span className="input-group-text">Condición:</span>
+                      <select
+                        className="form-select"
+                        value={condicion}
+                        onChange={(event) => setCondicion(event.target.value)}
+                      >
+                        <option value="">Seleccione...</option>
+                        <option value="Nuevo">Nuevo</option>
+                        <option value="Usado">Usado</option>
+                        <option value="Reparado">Reparado</option>
+                        <option value="Dañado">Dañado</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="col-12 col-md-6 mb-3">
+                    <div className="input-group">
+                      <span className="input-group-text">Código:</span>
+                      <input 
+                        type="number" 
+                        onChange={(event) => setCodigo(event.target.value)}
+                        className="form-control" 
+                        value={codigo} 
+                        placeholder="Ingrese el código" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-12 col-md-6 mb-3">
+                    <div className="input-group">
+                      <span className="input-group-text">Proveedor:</span>
+                      <select
+                        className="form-select"
+                        value={idProveedor}
+                        onChange={(event) => setIdProveedor(event.target.value)}
+                      >
+                        <option value="">Seleccione un proveedor</option>
+                        {proveedoresList.map((proveedor) => (
+                          <option key={proveedor.id_proveedores} value={proveedor.id_proveedores}>
+                            {proveedor.empresa} - {proveedor.nombre}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="card-footer text-muted">
@@ -279,12 +368,13 @@ function Inventario() {
               <table className="table table-striped table-hover">
                 <thead className="table-dark">
                   <tr>
-                    <th scope="col">Tipo</th>
+                    <th scope="col">Tipo de Equipo</th>
                     <th scope="col">Marca</th>
                     <th scope="col">Modelo</th>
                     <th scope="col">Precio</th>
-                    <th scope="col">Fecha Adq.</th>
+                    <th scope="col">Fecha Adquisición</th>
                     <th scope="col">Condición</th>
+                    <th scope="col">Código</th>
                     <th scope="col">Proveedor</th>
                     <th scope="col">Acciones</th>
                   </tr>
@@ -297,10 +387,11 @@ function Inventario() {
                         <td>{val.tipo_De_Equipo}</td>
                         <td>{val.Marca}</td>
                         <td>{val.Modelo}</td>
-                        <td>${val.Precio?.toFixed(2)}</td>
-                        <td>{new Date(val.Fecha_De_Adquisicion).toLocaleDateString()}</td>
+                        <td>{val.Precio}</td>
+                        <td>{val.Fecha_De_Adquisicion}</td>
                         <td>{val.Condicion}</td>
-                        <td>{proveedor ? `${proveedor.nombre} (${proveedor.empresa})` : 'N/A'}</td>
+                        <td>{val.Codigo}</td>
+                        <td>{proveedor ? `${proveedor.empresa} - ${proveedor.nombre}` : 'N/A'}</td>
                         <td>
                           <div className="btn-group" role="group">
                             <button 

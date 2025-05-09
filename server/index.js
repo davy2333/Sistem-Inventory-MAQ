@@ -14,6 +14,7 @@ const db = mysql.createConnection({
     user: "root",
     password: "",
     database: "systeminventorymaq",
+    port: 3307
 });
 
 // Conexión
@@ -79,7 +80,7 @@ app.delete("/tipoprenda/delete/:id", (req, res) => {
 });
 
 
-// ------------------------- CRUD PEDIDOS -------------------------
+// -------------------------  CRUD PEDIDOS --------------------------
 app.get("/pedidos", (req, res) => {
     const query = `
       SELECT 
@@ -149,19 +150,6 @@ app.post("/upload", upload.single('file'), (req, res) => {
 });
 
 
-// ------------------------- RUTAS PARA CLIENTES -------------------------
-app.get("/clientes", (req, res) => {
-    db.query('SELECT * FROM cliente',
-        (error, result) => {
-            if (error) {
-                console.log(error);
-                res.status(500).send(error);
-            } else {
-                res.send(result);
-            }
-        }
-    );
-});
 
 
 // ------------------------- CRUD CLIENTES -------------------------
@@ -329,42 +317,27 @@ app.delete("/bajas/delete/:id", (req, res) => {
 
 
 // ------------------------- CRUD HISTORIAL DE COMPRAS -------------------------
-app.post("/historial/create", (req, res) => {
-  const { id_inventario, fecha_compra, costo, proveedor } = req.body;
-  
-  // Validación de campos requeridos
-  if (!id_inventario || !fecha_compra || !costo) {
-      return res.status(400).send({ message: "Todos los campos son requeridos" });
-  }
-  
-  db.query(`INSERT INTO historial_de_compras 
-      (id_inventario, fecha_compra, costo, proveedor)
-      VALUES (?, ?, ?, ?)`,
-      [id_inventario, fecha_compra, costo, proveedor || null],
-      (err, result) => {
-          if (err) {
-              console.error(err);
-              res.status(500).send(err);
-          } else {
-              res.send(result);
-          }
-      });
-});
 
+// Ruta para obtener el historial con información del inventario
 app.get("/historial", (req, res) => {
   const query = `
-    SELECT h.*, 
-           i.tipo_De_Equipo, i.Marca, i.Modelo,
-           p.nombre as nombre_proveedor, p.empresa
+    SELECT 
+      h.id_historial,
+      i.tipo_De_Equipo,
+      i.Marca,
+      i.Modelo,
+      i.Precio,
+      i.Fecha_De_Adquisicion,
+      p.nombre AS proveedor
     FROM historial_de_compras h
     LEFT JOIN inventario i ON h.id_inventario = i.id_inventario
-    LEFT JOIN proveedores p ON h.proveedor = p.id_proveedores
-    ORDER BY h.fecha_compra DESC
+    LEFT JOIN proveedores p ON i.id_proveedores = p.id_proveedores
+    ORDER BY i.Fecha_De_Adquisicion DESC
   `;
   
   db.query(query, (err, result) => {
       if (err) {
-          console.error(err);
+          console.error('Error al obtener historial:', err);
           res.status(500).send(err);
       } else {
           res.send(result);
@@ -372,35 +345,44 @@ app.get("/historial", (req, res) => {
   });
 });
 
-app.put("/historial/update", (req, res) => {
-  const { id_historial, id_inventario, fecha_compra, costo, proveedor } = req.body;
+// Modificación de la ruta create-inventario para incluir el historial
+app.post('/create-inventario', (req, res) => {
+  const { tipoDeEquipo, marca, modelo, precio, fechaDeAdquisicion, condicion, codigo, idProveedor } = req.body;
   
-  // Validación de campos requeridos
-  if (!id_inventario || !fecha_compra || !costo) {
-      return res.status(400).send({ message: "Todos los campos son requeridos" });
-  }
-  
-  db.query(`UPDATE historial_de_compras SET 
-      id_inventario=?, fecha_compra=?, costo=?, proveedor=?
-      WHERE id_historial=?`,
-      [id_inventario, fecha_compra, costo, proveedor || null, id_historial],
+  // Primero insertamos en inventario
+  db.query(
+      'INSERT INTO inventario (tipo_De_Equipo, Marca, Modelo, Precio, Fecha_De_Adquisicion, Condicion, Codigo, id_proveedores) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [tipoDeEquipo, marca, modelo, precio, fechaDeAdquisicion, condicion, codigo, idProveedor],
       (err, result) => {
           if (err) {
-              console.error(err);
+              console.error('Error al crear inventario:', err);
               res.status(500).send(err);
           } else {
-              res.send(result);
+              // Luego insertamos en historial_de_compras
+              const idInventario = result.insertId;
+              db.query(
+                  'INSERT INTO historial_de_compras (id_inventario) VALUES (?)',
+                  [idInventario],
+                  (historialErr) => {
+                      if (historialErr) {
+                          console.error('Error al crear registro de historial:', historialErr);
+                          // Aunque falle el historial, respondemos con éxito el inventario
+                      }
+                      res.send(result);
+                  }
+              );
           }
-      });
+      }
+  );
 });
 
+// Ruta para eliminar un registro del historial (opcional)
 app.delete("/historial/delete/:id", (req, res) => {
   const id = req.params.id;
-  
-  db.query('DELETE FROM historial_de_compras WHERE id_historial=?', id,
+  db.query('DELETE FROM historial_de_compras WHERE id_historial = ?', id,
       (err, result) => {
           if (err) {
-              console.error(err);
+              console.error('Error al eliminar historial:', err);
               res.status(500).send(err);
           } else {
               res.send(result);
