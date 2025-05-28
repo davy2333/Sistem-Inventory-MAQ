@@ -4,6 +4,10 @@ const mysql = require("mysql");
 const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
+const { exec } = require("child_process");
+
+// middlewares
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -24,6 +28,40 @@ db.connect((err) => {
         return;
     }
     console.log('Conectado a la base de datos MySQL');
+});
+
+// Ruta para generar backup de la base de datos
+app.get('/backup', (req, res) => {
+  const backupDir = path.join(__dirname, 'backups');
+  if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir);
+
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const filename = `backup-${timestamp}.sql`;
+  const filepath = path.join(backupDir, filename);
+
+  // Ajusta si estás en Windows+XAMPP
+  const mysqldumpPath = process.platform === 'win32'
+    ? `"C:\\xampp\\mysql\\bin\\mysqldump.exe"`
+    : 'mysqldump';
+
+  const cmd = `${mysqldumpPath} -h localhost -P 3307 -u root systeminventorymaq > "${filepath}"`;
+
+  // *** DEBUG: mostramos el comando que vamos a ejecutar ***
+  console.log('Ejecutando backup con este cmd:\n', cmd);
+
+  exec(cmd, (error, stdout, stderr) => {
+    if (error) {
+      // *** DEBUG: mostramos TODO el error en consola ***
+      console.error('💥 Exec error:', error);
+      console.error('💥 stderr:', stderr);
+
+      return res
+        .status(500)
+        .json({ success: false, error: stderr.trim() });
+    }
+    console.log('✅ Backup creado:', filename);
+    res.json({ success: true, file: filename });
+  });
 });
 
 
@@ -366,7 +404,6 @@ app.post('/create-inventario', (req, res) => {
                   (historialErr) => {
                       if (historialErr) {
                           console.error('Error al crear registro de historial:', historialErr);
-                          // Aunque falle el historial, respondemos con éxito el inventario
                       }
                       res.send(result);
                   }
@@ -389,6 +426,9 @@ app.delete("/historial/delete/:id", (req, res) => {
           }
       });
 });
+
+
+
 
 
 // ------------------------- INICIAR SERVIDOR -------------------------

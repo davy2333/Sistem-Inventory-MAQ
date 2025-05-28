@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './NavBar.css';
+import logo from '../assets/logo.jpeg';
+import BackupButton from '../components/BackUpButtom.jsx';
 
 function Navbar() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -22,7 +24,7 @@ function Navbar() {
 
   return (
     <>
-      {/* Navbar superior */}
+      
       <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top">
         <div className="container-fluid">
           <a className="navbar-brand" onClick={toggleSidebar} style={{ cursor: 'pointer' }}>
@@ -30,14 +32,20 @@ function Navbar() {
               <i className="bi bi-list"></i>
             </span>
           </a>
-          <span className="navbar-text">Sistema de Gestión</span>
+          <img
+            src={logo}
+            alt="Logo"
+            className="navbar-logo"
+            style={{ width: '70px', height: '60px', objectFit: 'cover' }}
+          />
         </div>
+        
       </nav>
 
       {/* Sidebar */}
       <div className={`sidebar bg-dark ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-header">
-          <h5 className="text-white">Menú</h5>
+          <h5 className="text-black">Menú</h5>
           <button type="button" className="btn-close btn-close-white d-lg-none" onClick={toggleSidebar}></button>
         </div>
         <hr className="text-white-50" />
@@ -87,6 +95,7 @@ function Navbar() {
               <i className="bi bi-trash me-2"></i>Bajas
             </Link>
           </li>
+          <BackupButton />
         </ul>
       </div>
 
