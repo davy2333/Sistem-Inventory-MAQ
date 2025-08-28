@@ -45,6 +45,7 @@ function Inventario() {
   const getInventario = () => {
     Axios.get("http://localhost:3001/inventario")
       .then((response) => {
+        console.log('Datos recibidos del inventario:', response.data); // ← PARA DEBUG
         setInventario(response.data);
       })
       .catch((error) => {
@@ -67,14 +68,14 @@ function Inventario() {
     getProveedores();
   }, []);
 
-  // Filtrar inventario según la búsqueda
+  // Filtrar inventario según la búsqueda (CAMBIADO a minúsculas)
   const inventarioFiltrado = inventarioList.filter(item => {
     return (
-      item.tipo_De_Equipo.toLowerCase().includes(busqueda.toLowerCase()) ||
-      (item.Marca && item.Marca.toLowerCase().includes(busqueda.toLowerCase())) ||
-      (item.Modelo && item.Modelo.toLowerCase().includes(busqueda.toLowerCase())) ||
-      (item.Codigo && item.Codigo.toString().includes(busqueda)) ||
-      (item.Condicion && item.Condicion.toLowerCase().includes(busqueda.toLowerCase()))
+      (item.tipo_de_equipo && item.tipo_de_equipo.toLowerCase().includes(busqueda.toLowerCase())) ||
+      (item.marca && item.marca.toLowerCase().includes(busqueda.toLowerCase())) ||
+      (item.modelo && item.modelo.toLowerCase().includes(busqueda.toLowerCase())) ||
+      (item.codigo && item.codigo.toString().includes(busqueda)) ||
+      (item.condicion && item.condicion.toLowerCase().includes(busqueda.toLowerCase()))
     );
   });
 
@@ -140,7 +141,7 @@ function Inventario() {
   const deleteItem = (val) => {
     Swal.fire({
       title: "¿Confirmar?",
-      html: `<i>¿Realmente desea eliminar el equipo <strong>${val.tipo_De_Equipo}</strong>?</i>`,
+      html: `<i>¿Realmente desea eliminar el equipo <strong>${val.tipo_de_equipo}</strong>?</i>`, // ← CAMBIADO
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -153,7 +154,7 @@ function Inventario() {
           LimpiarCampos();
           Swal.fire({
             title: "¡Eliminado!",
-            text: `${val.tipo_De_Equipo} fue eliminado`,
+            text: `${val.tipo_de_equipo} fue eliminado`, // ← CAMBIADO
             icon: "success",
             timer: 850
           });
@@ -183,13 +184,13 @@ function Inventario() {
 
   const editarItem = (val) => {
     setEditar(true);
-    setTipoDeEquipo(val.tipo_De_Equipo);
-    setMarca(val.Marca);
-    setModelo(val.Modelo);
-    setPrecio(val.Precio);
-    setFechaDeAdquisicion(val.Fecha_De_Adquisicion);
-    setCondicion(val.Condicion);
-    setCodigo(val.Codigo);
+    setTipoDeEquipo(val.tipo_de_equipo); // ← CAMBIADO
+    setMarca(val.marca); // ← CAMBIADO
+    setModelo(val.modelo); // ← CAMBIADO
+    setPrecio(val.precio); // ← CAMBIADO
+    setFechaDeAdquisicion(val.fecha_de_adquisicion); // ← CAMBIADO
+    setCondicion(val.condicion); // ← CAMBIADO
+    setCodigo(val.codigo); // ← CAMBIADO
     setIdProveedor(val.id_proveedores);
     setIdInventario(val.id_inventario);
   };
@@ -230,7 +231,7 @@ function Inventario() {
         <div className="row justify-content-center">
           <div className="col-12 col-md-10">
             <div className="card text-center my-4">
-              <div className="card-header bg-primary text-white">
+              <div className="card-header  text-black bg-light">
                 <h1 className="h5 mb-0">INVENTARIO</h1>
               </div>
               <div className="card-body">
@@ -365,8 +366,8 @@ function Inventario() {
         <div className="row justify-content-center">
           <div className="col-12">
             <div className="table-responsive">
-              <table className="table table-striped table-hover">
-                <thead className="table-dark">
+              <table className="table table-hover ">
+                <thead className="table">
                   <tr>
                     <th scope="col">Tipo de Equipo</th>
                     <th scope="col">Marca</th>
@@ -384,13 +385,13 @@ function Inventario() {
                     const proveedor = proveedoresList.find(p => p.id_proveedores === val.id_proveedores);
                     return (
                       <tr key={val.id_inventario}>
-                        <td>{val.tipo_De_Equipo}</td>
-                        <td>{val.Marca}</td>
-                        <td>{val.Modelo}</td>
-                        <td>{val.Precio}</td>
-                        <td>{val.Fecha_De_Adquisicion}</td>
-                        <td>{val.Condicion}</td>
-                        <td>{val.Codigo}</td>
+                        <td>{val.tipo_de_equipo}</td> {/* ← CAMBIADO */}
+                        <td>{val.marca}</td> {/* ← CAMBIADO */}
+                        <td>{val.modelo}</td> {/* ← CAMBIADO */}
+                        <td>{val.precio}</td> {/* ← CAMBIADO */}
+                        <td>{val.fecha_de_adquisicion}</td> {/* ← CAMBIADO */}
+                        <td>{val.condicion}</td> {/* ← CAMBIADO */}
+                        <td>{val.codigo}</td> {/* ← CAMBIADO */}
                         <td>{proveedor ? `${proveedor.empresa} - ${proveedor.nombre}` : 'N/A'}</td>
                         <td>
                           <div className="btn-group" role="group">

@@ -263,7 +263,7 @@ function Cliente() {
         <div className="row justify-content-center">
           <div className="col-12">
             <div className="table-responsive">
-              <table className="table table-striped table-hover">
+              <table className="table table-hover">
                 <thead className="table-dark">
                   <tr>
                     <th scope="col">Nombre</th>

@@ -57,3 +57,30 @@ body {
 .form-control {
   min-height: 38px;
 }
+
+
+
+
+
+.table-transparent th,
+.table-transparent td {
+  border: none !important;
+}
+
+/* Deja la tabla totalmente transparente */
+.table-transparent {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+
+/* Celdas también transparentes */
+.table-transparent thead th,
+.table-transparent tbody td {
+  background: transparent !important;
+}
+
+/* Si quieres mantener el hover, ajusta su color */
+.table-transparent.table-hover tbody tr:hover td {
+  /* un blanco semitransparente sobre el degradado */
+  background-color: rgba(255,255,255,0.2) !important;
+}

@@ -21,6 +21,7 @@ body {
     z-index: 1020;
     overflow-y: auto;
     transition: all 0.3s;
+    
   }
   
   .sidebar-open {
