@@ -40,6 +40,7 @@ function Bajas() {
   const getBajas = () => {
     Axios.get("http://localhost:3001/bajas")
       .then((response) => {
+        console.log('Datos recibidos de bajas:', response.data); // ← PARA DEBUG
         setBajasList(response.data);
       })
       .catch((error) => {
@@ -50,6 +51,7 @@ function Bajas() {
   const getInventario = () => {
     Axios.get("http://localhost:3001/inventario")
       .then((response) => {
+        console.log('Datos recibidos de inventario:', response.data); // ← PARA DEBUG
         setInventarioList(response.data);
       })
       .catch((error) => {
@@ -164,7 +166,7 @@ function Bajas() {
 
   const getEquipoInfo = (id) => {
     const equipo = inventarioList.find(item => item.id_inventario == id);
-    return equipo ? `${equipo.tipo_De_Equipo} - ${equipo.Marca} ${equipo.Modelo}` : 'Equipo no encontrado';
+    return equipo ? `${equipo.tipo_de_equipo} - ${equipo.marca} ${equipo.modelo}` : 'Equipo no encontrado'; // ← CAMBIADO
   }
 
   return (
@@ -196,7 +198,7 @@ function Bajas() {
                           <option value="">Seleccione un equipo</option>
                           {inventarioList.map((item) => (
                             <option key={item.id_inventario} value={item.id_inventario}>
-                              {item.tipo_De_Equipo} - {item.Marca} {item.Modelo}
+                              {item.tipo_de_equipo} - {item.marca} {item.modelo} {/* ← CAMBIADO */}
                             </option>
                           ))}
                         </select>

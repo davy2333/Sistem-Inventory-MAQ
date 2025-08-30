@@ -39,6 +39,7 @@ function Cliente() {
   const getClientes = () => {
     Axios.get("http://localhost:3001/clientes")
       .then((response) => {
+        console.log('Datos recibidos de clientes:', response.data); // ← PARA DEBUG
         setClientes(response.data);
       })
       .catch((error) => {
@@ -50,12 +51,12 @@ function Cliente() {
     getClientes();
   }, []);
 
-  // Filtrar clientes según la búsqueda
+  // Filtrar clientes según la búsqueda (CAMBIADO a minúsculas)
   const clientesFiltrados = clientesList.filter(cli => {
     return (
-      cli.Cliente.toLowerCase().includes(busqueda.toLowerCase()) ||
+      (cli.cliente && cli.cliente.toLowerCase().includes(busqueda.toLowerCase())) || // ← CAMBIADO
       (cli.numero_telefonico && cli.numero_telefonico.toString().includes(busqueda)) ||
-      (cli.Email && cli.Email.toLowerCase().includes(busqueda.toLowerCase()))
+      (cli.email && cli.email.toLowerCase().includes(busqueda.toLowerCase())) // ← CAMBIADO
     );
   });
 
@@ -117,7 +118,7 @@ function Cliente() {
   const deleteCliente = (val) => {
     Swal.fire({
       title: "¿Confirmar?",
-      html: `<i>¿Realmente desea eliminar al cliente <strong>${val.Cliente}</strong>?</i>`,
+      html: `<i>¿Realmente desea eliminar al cliente <strong>${val.cliente}</strong>?</i>`, // ← CAMBIADO
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -131,7 +132,7 @@ function Cliente() {
             LimpiarCampos();
             Swal.fire({
               title: "¡Eliminado!",
-              text: val.Cliente + " fue eliminado",
+              text: val.cliente + " fue eliminado", // ← CAMBIADO
               icon: "success",
               timer: 850
             });
@@ -159,9 +160,9 @@ function Cliente() {
 
   const editarCliente = (val) => {
     setEditar(true);
-    setCliente(val.Cliente);
+    setCliente(val.cliente); // ← CAMBIADO
     setNumeroTelefonico(val.numero_telefonico);
-    setEmail(val.Email);
+    setEmail(val.email); // ← CAMBIADO
     setIdCliente(val.id_cliente);
   };
 
@@ -275,9 +276,9 @@ function Cliente() {
                 <tbody>
                   {clientesFiltrados.map((val) => (
                     <tr key={val.id_cliente}>
-                      <td>{val.Cliente}</td>
+                      <td>{val.cliente}</td> {/* ← CAMBIADO */}
                       <td>{val.numero_telefonico}</td>
-                      <td>{val.Email}</td>
+                      <td>{val.email}</td> {/* ← CAMBIADO */}
                       <td>
                         <div className="btn-group" role="group">
                           <button 

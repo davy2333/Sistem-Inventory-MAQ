@@ -1,22 +1,22 @@
 const express = require("express");
 const app = express();
-const { Pool } = require("pg"); // ← Cambiado de mysql a pg
+const { Pool } = require("pg");
 const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const { exec } = require("child_process");
-require('dotenv').config(); // ← Añadido para variables de entorno
+require('dotenv').config();
 
 // middlewares
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Configuración de conexión a PostgreSQL ← TOTALMENTE CAMBIADO
+// Configuración de conexión a PostgreSQL
 const pool = new Pool({
     user: process.env.DB_USER || 'postgres',
-    host: process.env.DB_HOST || 'localhost',
+    host: process.env.DB_HOST || '13.62.102.226',
     database: process.env.DB_NAME || 'systeminventorymaq',
     password: process.env.DB_PASSWORD || '',
     port: process.env.DB_PORT || 5432,
@@ -28,7 +28,7 @@ pool.connect((err, client, release) => {
         console.error('Error conectando a la base de datos PostgreSQL:', err);
         return;
     }
-    console.log('Conectado a la base de datos PostgreSQL');
+    console.log('Conectado a la base de datos PostgreSQL en 13.62.102.226');
     release();
 });
 
@@ -492,6 +492,7 @@ app.delete("/historial/delete/:id", async (req, res) => {
 });
 
 // ------------------------- INICIAR SERVIDOR -------------------------
-app.listen(3001, () => {
-    console.log("Servidor corriendo en el puerto 3001 (PostgreSQL)");
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Servidor corriendo en el puerto ${PORT} (PostgreSQL) en la IP 13.62.102.226`);
 });
